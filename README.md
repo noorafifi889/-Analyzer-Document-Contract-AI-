@@ -1,58 +1,51 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ⚖️ AI Contract & Document Analyzer
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Welcome to the **AI Contract & Document Analyzer**—an intelligent, modern platform designed to revolutionize how we interact with legal agreements and long-form documentation. 
 
-## About Laravel
+Instead of spending hours manually reading through dozens of complex pages, users can simply upload their documents to instantly unlock actionable, AI-driven insights, assess structural risks, and converse directly with their files.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🌟 Developed By
+* **Nour Al Afifi**
+  * *Front-End & Full-Stack Developer*
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🚀 The Core Vision
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Reading contracts line-by-line is tedious and prone to human oversight. [cite_start]This platform leverages the intersection of modern web architectures and cutting-edge Artificial Intelligence to deliver a seamless automated solution[cite: 15, 16]. [cite_start]It simplifies complex legal prose into clear, actionable summaries, empowering professionals to make faster, data-backed decisions[cite: 16, 21].
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## ✨ Key Features
 
-## Agentic Development
+* [cite_start]**🧠 Intelligent AI Summarization:** Automatically identifies and extracts critical metadata such as contract types, involved parties, effective durations, and primary obligations[cite: 118, 119].
+* **🛡️ Automated Risk Assessment (Risk Score):** Analyzes the entire text to calculate a custom risk percentage (0-100%). [cite_start]It categorizes documents into *Low, Medium, or High Risk* tiers while explicitly pointing out strict penalty clauses or automatic renewals[cite: 20, 124, 125, 127].
+* **💬 Interactive "Chat with Contract":** Features a context-aware AI chatbot. [cite_start]Users can ask natural language questions directly to their document (e.g., *"Is there a penalty clause?"* or *"When does this agreement expire?"*)[cite: 22, 44, 45, 140].
+* [cite_start]**📊 Professional PDF Export:** Generates highly polished executive PDF summaries that compile the risk analysis, key extracted clauses, and full user-AI conversation logs into a single, downloadable report[cite: 22, 50, 143].
+* [cite_start]**👥 Dual-Role System & API:** Features an advanced User Dashboard to manage private files and a comprehensive Admin Panel for complete system oversight, all fully accessible via a secure REST API[cite: 33, 40, 51, 52, 148].
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
 
-```bash
-composer require laravel/boost --dev
+## 🛠️ Technical Ecosystem
 
-php artisan boost:install
-```
+The architecture is engineered for performance, security, and smooth asynchronous execution:
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+| Layer | Technologies Used |
+| :--- | :--- |
+| **Backend Framework** | [cite_start]Laravel (PHP) & Composer [cite: 23] |
+| **Frontend UI** | [cite_start]Blade Templates & Tailwind CSS [cite: 23] |
+| **Authentication** | [cite_start]Laravel Breeze (Role-based: User / Admin) [cite: 23, 81] |
+| **Database & Storage** | [cite_start]MySQL / MariaDB & Laravel Storage [cite: 23] |
+| **Async Background Processing** | [cite_start]Laravel Queues & Jobs (for seamless text extraction and AI parsing) [cite: 23] |
+| **AI Integration** | [cite_start]OpenAI API (or any compatible AI provider) [cite: 23] |
+| **API Layer** | [cite_start]REST API via Laravel Sanctum [cite: 147] |
+| **Document Processing** | [cite_start]PDF & DOCX Text Extraction engines [cite: 23] |
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🔒 Security & Privacy
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+* [cite_start]**Strict Isolation:** Users only have access to their own uploaded files and historical analysis[cite: 40, 148].
+* [cite_start]**Secure API Endpoints:** Protected via token-based authentication using Laravel Sanctum[cite: 147].
