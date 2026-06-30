@@ -20,13 +20,31 @@
         </div>
 
         <!-- زر الرفع وصيغ الملفات -->
-        <div class="pt-lg flex flex-col items-center gap-md">
-            <button class="upload-gradient text-on-primary px-xl py-md rounded-lg font-headline-sm flex items-center gap-sm hover:opacity-90 active:scale-95 transition-all shadow-md group">
-                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">upload_file</span>
-                Upload Document
-            </button>
-            <p class="font-body-sm text-body-sm text-outline">Supported formats: PDF, DOCX, TXT. Max size 25MB.</p>
-        </div>
+     <form action="/upload" method="POST" enctype="multipart/form-data" class="pt-lg flex flex-col items-center gap-md">
+    @csrf
+
+    <label for="document"
+        class="upload-gradient text-on-primary px-xl py-md rounded-lg font-headline-sm flex items-center gap-sm hover:opacity-90 active:scale-95 transition-all shadow-md group cursor-pointer">
+
+        <span class="material-symbols-outlined"
+            style="font-variation-settings: 'FILL' 1;">
+            upload_file
+        </span>
+
+        Upload Document
+    </label>
+
+    <input
+        type="file"
+        id="document"
+        name="document"
+        accept=".pdf,.doc,.docx,.txt"
+        class="hidden">
+
+    <p class="font-body-sm text-body-sm text-outline">
+        Supported formats: PDF, DOCX, TXT. Max size 25MB.
+    </p>
+</form>
 
         <!-- شبكة المميزات الثلاثية (Bento Grid) متطابقة مع image_4a658d.png -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-md mt-xxl text-left">
