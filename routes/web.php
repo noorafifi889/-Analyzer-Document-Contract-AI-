@@ -19,7 +19,7 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-
+Route::get('/history', [DocumentController::class, 'history'])->name('documents.history');
 Route::middleware('auth')->group(function () {
     
     // الرواتس الإضافية الخاصة بك (ضعها قبل الـ show لتجنب أي تضارب في قراءة الـ URL)
