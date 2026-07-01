@@ -20,12 +20,13 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-
-
-Route::middleware(['auth'])->group(function () {
-    // رابط لعرض صفحة الرفع
-    Route::get('/documents/upload', [DocumentController::class, 'create'])->name('documents.create');
+Route::middleware('auth')->group(function () {
     
-    // رابط معالجة رفع الملف وحفظه
-    Route::post('/documents/upload', [DocumentController::class, 'store'])->name('documents.store');
+    // الرواتس الإضافية الخاصة بك (ضعها قبل الـ show لتجنب أي تضارب في قراءة الـ URL)
+    Route::get('/documents/{document}/analyzing', [DocumentController::class, 'analyzing'])->name('documents.analyzing');
+    Route::get('/documents/{document}/status', [DocumentController::class, 'status'])->name('documents.status');
+
+    // الـ Resource الكامل أصبح الآن محمياً بالـ auth ومسؤول عن (index, create, store, show, edit, update, destroy)
+    Route::resource('documents', DocumentController::class);
+    
 });
