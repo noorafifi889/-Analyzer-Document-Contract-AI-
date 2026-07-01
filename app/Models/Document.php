@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Document extends Model
 {
-    protected $fillable = ['user_id', 'title', 'file_path', 'status'];
+    protected $fillable = ['user_id', 'original_name', 'title', 'file_path', 'status'];
 
     // Document belongsTo User
     public function user(): BelongsTo
