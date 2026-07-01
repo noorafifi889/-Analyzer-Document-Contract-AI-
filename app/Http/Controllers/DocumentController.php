@@ -38,13 +38,12 @@ class DocumentController extends Controller
 
     return view('documents.history', compact('documents'));
 }
-    public function show(Document $document)
+public function show($id)
 {
+    $document = auth()->user()->documents()->findOrFail($id);
 
-    // return response()->json($document);
-    
-    // أو إذا كنت ترجع صفحة Blade:
-    // return view('documents.show', compact('document'));
+    // تمرير المتغير إلى الفيو الذي أنشأناه بالأعلى
+    return view('documents.show', compact('document'));
 }
     public function analyzing(Document $document)
     {
@@ -62,4 +61,6 @@ class DocumentController extends Controller
             'progress' => $document->progress,
         ]);
     }
+
+    
 }
