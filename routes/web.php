@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,3 +19,13 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+
+
+Route::middleware(['auth'])->group(function () {
+    // رابط لعرض صفحة الرفع
+    Route::get('/documents/upload', [DocumentController::class, 'create'])->name('documents.create');
+    
+    // رابط معالجة رفع الملف وحفظه
+    Route::post('/documents/upload', [DocumentController::class, 'store'])->name('documents.store');
+});
