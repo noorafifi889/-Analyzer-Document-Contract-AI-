@@ -174,7 +174,7 @@
                     LexiGuard AI
                 </div>
                 <nav class="hidden md:flex items-center space-x-lg font-body-md text-body-md">
-                    <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Documents</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors" href="{{ route('dashboard') }}">Documents</a>
 <a class="text-on-surface-variant hover:text-primary transition-colors" href="{{ route('documents.history') }}">History</a>
                     <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Templates</a>
                 </nav>
