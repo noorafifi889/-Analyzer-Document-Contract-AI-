@@ -12,8 +12,9 @@ class Document extends Model
 protected $fillable = [
     'user_id',
     'original_name',
+    'title',         
     'file_path',
-    'file_type',
+    'file_type',      
     'status',
     'progress',
     'extracted_text',
