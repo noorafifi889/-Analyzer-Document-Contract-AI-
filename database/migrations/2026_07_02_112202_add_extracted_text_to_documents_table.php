@@ -13,7 +13,6 @@ return new class extends Migration
     public function up(): void
 {
     Schema::table('documents', function (Blueprint $table) {
-        // حذفنا سطر after عشان ينزل الحقل بآخر الجدول بدون مشاكل
         $table->longText('extracted_text')->nullable();
     });
 }
