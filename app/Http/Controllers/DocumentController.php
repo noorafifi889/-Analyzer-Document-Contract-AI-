@@ -62,5 +62,11 @@ public function show($id)
         ]);
     }
 
-    
+    public function getStatus(Document $document)
+{
+    return response()->json([
+        'status'   => $document->status,   // سيعود بـ processing أو done
+        'progress' => $document->progress  // سيعود بـ 20، 50، 90، أو 100
+    ]);
+}
 }
