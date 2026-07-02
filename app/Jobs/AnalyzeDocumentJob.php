@@ -17,14 +17,15 @@ class AnalyzeDocumentJob implements ShouldQueue
 
     public function handle(): void
     {
+        // 1. بدء المعالجة
         $this->document->update(['status' => 'processing', 'progress' => 20]);
+        sleep(3); // ننتظر 3 ثوانٍ لمحاكاة استخراج النص مؤقتاً
 
-        // TODO: استخراج النص من PDF/DOCX
         $this->document->update(['progress' => 50]);
-
-        // TODO: إرسال النص لـ AI وحفظ النتيجة بجدول analyses
+        sleep(3); 
         $this->document->update(['progress' => 90]);
+        sleep(2); 
 
-        $this->document->update(['status' => 'done', 'progress' => 100]);
+$this->document->update(['status' => 'done', 'progress' => 100]);
     }
 }
