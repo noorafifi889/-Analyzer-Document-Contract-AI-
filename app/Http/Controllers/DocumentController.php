@@ -21,6 +21,7 @@ class DocumentController extends Controller
             'original_name' => $request->file('document')->getClientOriginalName(),
             'title'         => pathinfo($request->file('document')->getClientOriginalName(), PATHINFO_FILENAME),
             'file_path'     => $path,
+            'file_type'     => $request->file('document')->getClientOriginalExtension(),
             'status'        => 'pending',
             'progress'      => 0,
         ]);
