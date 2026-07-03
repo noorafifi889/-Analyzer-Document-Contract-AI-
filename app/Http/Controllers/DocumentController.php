@@ -8,30 +8,45 @@ use Illuminate\Http\Request;
 
 class DocumentController extends Controller
 {
-    public function store(Request $request)
-    {
-        $request->validate([
-            'document' => 'required|file|mimes:pdf,doc,docx|max:10240',
+  public function store(Request $request)
+{
+    $request->validate([
+        'document' => 'required|file|mimes:pdf,doc,docx,txt|max:10240',
+    ]);
+
+    // 1. جلب اسم الملف الأصلي قبل رفعه
+    $originalName = $request->file('document')->getClientOriginalName();
+
+    // 2. التحقق مما إذا كان المستخدم الحالي قد رفع ملفاً بنفس الاسم سابقاً
+    $existingDocument = Document::where('user_id', auth()->id())
+                                ->where('original_name', $originalName)
+                                ->first();
+
+    if ($existingDocument) {
+        // إذا كان الملف موجوداً، نقوم بإرجاع المستخدم للخلف مع رسالة خطأ واضحة
+        return redirect()->back()->withErrors([
+'document' => 'This document has already been uploaded! You can find it in your history.'
         ]);
-
-        $path = $request->file('document')->store('documents');
-
-        $document = Document::create([
-            'user_id' => auth()->id(),
-            'original_name' => $request->file('document')->getClientOriginalName(),
-            'title' => pathinfo($request->file('document')->getClientOriginalName(), PATHINFO_FILENAME),
-            'file_path' => $path,
-            'file_type' => $request->file('document')->getClientOriginalExtension(),
-            'status' => 'pending',
-            'progress' => 0,
-        ]);
-
-        // إرسال الملف للتحليل بالخلفية
-        AnalyzeDocumentJob::dispatch($document);
-
-        return redirect()->route('documents.analyzing', $document);
     }
 
+    // 3. إذا لم يكن موجوداً، يكمل الكود طبيعي ويقوم بالرفع
+    $path = $request->file('document')->store('documents');
+
+    $document = Document::create([
+        'user_id' => auth()->id(),
+        'original_name' => $originalName,
+        'title' => pathinfo($originalName, PATHINFO_FILENAME),
+        'file_path' => $path,
+        'file_type' => $request->file('document')->getClientOriginalExtension(),
+        'status' => 'pending',
+        'progress' => 0,
+    ]);
+
+    // إرسال الملف للتحليل بالخلفية
+    AnalyzeDocumentJob::dispatch($document);
+
+    return redirect()->route('documents.analyzing', ['document' => $document->id]);
+}
     public function history()
     {
         // جلب مستندات المستخدم الحالي فقط وترتيبها من الأحدث للأقدم مع الترقيم (Pagination)
@@ -40,24 +55,28 @@ class DocumentController extends Controller
         return view('documents.history', compact('documents'));
     }
 
-    public function show($id)
+    public function show(Document $document)
     {
-        $document = auth()->user()->documents()->findOrFail($id);
+        $document->load('analyses');
+        $analysis = $document->analyses->first();
 
-        // تمرير المتغير إلى الفيو الذي أنشأناه بالأعلى
-        return view('documents.show', compact('document'));
+        if ($document->status !== 'done' || ! $analysis) {
+            // التعديل: نمرر البرامتر كمصفوفة مفتاح وقيمة واضحة تماشيًا مع الروت [document => id]
+            return redirect()->route('documents.analyzing', ['document' => $document->id]);
+        }
+
+        return view('documents.show', compact('document', 'analysis'));
     }
 
-    public function destroy(string $id)
+    public function destroy(Document $document)
     {
-        $document = Document::findOrFail($id);
         $document->delete();
 
         // if($document->cover_image) {
         //     Storage::disk('public')->delete($document->cover_image);
         // }
 
-        return redirect()->to('/history')->with('success', 'Document deleted successfully!');
+        return redirect()->to('/documents/history')->with('success', 'Document deleted successfully!');
     }
 
     public function analyzing(Document $document)
