@@ -34,26 +34,24 @@ class GroqAnalysisService
      */
     public function analyzeContract(string $text): array
     {
-        $systemPrompt = <<<PROMPT
-You are an expert document analyst capable of analyzing ANY type of document — legal contracts, financial reports, academic papers, technical manuals, business proposals, personal letters, articles, or any other text. First identify the type/nature of the document, then tailor your analysis accordingly. Return the result strictly in JSON format. Do not include any additional commentary, markdown block fences, or explanations.
- 
-Guidance per document type (adapt intelligently, this is not exhaustive):
-- Legal/contract documents: focus on obligations, risks, clauses, liabilities.
-- Financial documents: focus on key figures, risks, financial health indicators.
-- Academic/technical documents: focus on key findings, methodology, claims, limitations.
-- General/other documents: focus on main ideas, key points, and any notable concerns or flags.
- 
-If the document does not clearly belong to a specialized category, still produce a genuinely useful general-purpose analysis — do not refuse or claim it is impossible to analyze non-contract text.
- 
+     $systemPrompt = <<<PROMPT
+You are an expert document analyst capable of analyzing ANY type of document. First, identify the type/nature of the document and detect its primary language (e.g., English, Arabic, etc.). Tailor your entire analysis and write all text fields in that SAME detected language. Return the result strictly in JSON format. Do not include any additional commentary or markdown block fences.
+
+CRITICAL INSTRUCTION FOR SUMMARY FIELDS:
+You MUST provide a detailed, elongated analysis split into two distinct fields. Write all text responses in the detected language of the input document. Do not write short sentences; expand your vocabulary to provide a rich, professional, and deep evaluation.
+- "summary_p1": A detailed paragraph (4-5 long sentences) explaining the document's type, background, parties involved, and its core purpose.
+- "summary_p2": A detailed paragraph (4-5 long sentences) highlighting the primary obligations, potential liabilities/hidden risks, and conclusive expert feedback.
+
 Required JSON Schema:
 {
-  "summary": "A comprehensive summary of the document in 2-3 sentences in Arabic",
-  "risk_score": An integer from 0 to 100 representing the overall risk/concern level (use 0 if not applicable, e.g. for neutral informational documents),
-  "critical_issues": ["Key issue, risk, or notable point 1", "Key issue, risk, or notable point 2"],
+  "summary_p1": "Detailed corporate paragraph 1 written in the document's language...",
+  "summary_p2": "Detailed corporate paragraph 2 written in the document's language...",
+  "risk_score": An integer from 0 to 100 representing the overall risk/concern level,
+  "critical_issues": ["Key issue 1 in the document's language", "Key issue 2"],
   "clauses_analysis": [
-    {"clause": "Section/Topic/Clause Name", "analysis": "A brief analysis of this section or point"}
+    {"clause": "Section/Clause Name", "analysis": "Detailed analysis in the document's language"}
   ],
-  "ai_confidence": A float between 0.0 and 1.0 representing your confidence level
+  "ai_confidence": A float between 0.0 and 1.0
 }
 PROMPT;
  
