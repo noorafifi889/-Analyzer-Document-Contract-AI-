@@ -125,12 +125,29 @@
                     <span class="font-body-sm text-body-sm text-on-surface-variant mb-1">all time</span>
                 </div>
             </div>
-            <div class="bg-surface-container-low p-lg rounded-xl border border-outline-variant flex flex-col justify-between">
-                <span class="font-label-md text-label-md text-on-surface-variant uppercase block">Quick Action</span>
-                <a href="{{ route('documents.create') }}" class="w-full bg-primary text-on-primary py-sm rounded-lg font-body-md text-body-md mt-md text-center hover:opacity-90 transition-opacity">
-                    Upload New Document
-                </a>
-            </div>
+<div class="bg-surface-container-low p-lg rounded-xl border border-outline-variant flex flex-col justify-between">
+    <span class="font-label-md text-label-md text-on-surface-variant uppercase block">Quick Action</span>
+    
+    <form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data" id="dashboard-upload-form" class="pt-lg flex flex-col items-center gap-md">
+        @csrf
+
+        <label for="document" id="upload-label"
+            class="upload-gradient text-on-primary px-xl py-md rounded-lg font-headline-sm flex items-center gap-sm hover:opacity-90 active:scale-95 transition-all shadow-md group cursor-pointer">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">
+                upload_file
+            </span>
+            <span>Upload Document</span>
+        </label>
+
+        <input
+            type="file"
+            id="document"
+            name="document"
+            accept=".pdf,.docx,.txt"
+            onchange="document.getElementById('dashboard-upload-form').submit();"
+            class="hidden">
+    </form>
+</div>
         </div>
     </div>
 </x-layouts.app>
