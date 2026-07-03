@@ -11,15 +11,18 @@ class Analysis extends Model
     protected $fillable = [
         'document_id', 
         'risk_score', 
+                'summary',
+
         'critical_issues', 
         'ai_confidence', 
         'clauses_analysis'
     ];
-
-    protected $casts = [
-        'clauses_analysis' => 'array', // تحويل تلقائي من وإلى JSON
+   protected $casts = [
+        'critical_issues' => 'array',
+        'clauses_analysis' => 'array',
+        'risk_score' => 'integer',
+        'ai_confidence' => 'float',
     ];
-
     // Analysis belongsTo Document
     public function document(): BelongsTo
     {
