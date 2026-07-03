@@ -17,13 +17,13 @@ class DocumentController extends Controller
         $path = $request->file('document')->store('documents');
 
         $document = Document::create([
-            'user_id'       => auth()->id(),
+            'user_id' => auth()->id(),
             'original_name' => $request->file('document')->getClientOriginalName(),
-            'title'         => pathinfo($request->file('document')->getClientOriginalName(), PATHINFO_FILENAME),
-            'file_path'     => $path,
-            'file_type'     => $request->file('document')->getClientOriginalExtension(),
-            'status'        => 'pending',
-            'progress'      => 0,
+            'title' => pathinfo($request->file('document')->getClientOriginalName(), PATHINFO_FILENAME),
+            'file_path' => $path,
+            'file_type' => $request->file('document')->getClientOriginalExtension(),
+            'status' => 'pending',
+            'progress' => 0,
         ]);
 
         // إرسال الملف للتحليل بالخلفية
@@ -33,19 +33,33 @@ class DocumentController extends Controller
     }
 
     public function history()
-{
-    // جلب مستندات المستخدم الحالي فقط وترتيبها من الأحدث للأقدم مع الترقيم (Pagination)
-    $documents = auth()->user()->documents()->latest()->paginate(10);
+    {
+        // جلب مستندات المستخدم الحالي فقط وترتيبها من الأحدث للأقدم مع الترقيم (Pagination)
+        $documents = auth()->user()->documents()->latest()->paginate(10);
 
-    return view('documents.history', compact('documents'));
-}
-public function show($id)
-{
-    $document = auth()->user()->documents()->findOrFail($id);
+        return view('documents.history', compact('documents'));
+    }
 
-    // تمرير المتغير إلى الفيو الذي أنشأناه بالأعلى
-    return view('documents.show', compact('document'));
-}
+    public function show($id)
+    {
+        $document = auth()->user()->documents()->findOrFail($id);
+
+        // تمرير المتغير إلى الفيو الذي أنشأناه بالأعلى
+        return view('documents.show', compact('document'));
+    }
+
+    public function destroy(string $id)
+    {
+        $document = Document::findOrFail($id);
+        $document->delete();
+
+        // if($document->cover_image) {
+        //     Storage::disk('public')->delete($document->cover_image);
+        // }
+
+        return redirect()->to('/history')->with('success', 'Document deleted successfully!');
+    }
+
     public function analyzing(Document $document)
     {
         abort_unless($document->user_id === auth()->id(), 403);
@@ -58,16 +72,16 @@ public function show($id)
         abort_unless($document->user_id === auth()->id(), 403);
 
         return response()->json([
-            'status'   => $document->status,
+            'status' => $document->status,
             'progress' => $document->progress,
         ]);
     }
 
     public function getStatus(Document $document)
-{
-    return response()->json([
-        'status'   => $document->status,   // سيعود بـ processing أو done
-        'progress' => $document->progress  // سيعود بـ 20، 50، 90، أو 100
-    ]);
-}
+    {
+        return response()->json([
+            'status' => $document->status,   // سيعود بـ processing أو done
+            'progress' => $document->progress,  // سيعود بـ 20، 50، 90، أو 100
+        ]);
+    }
 }
