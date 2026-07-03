@@ -30,55 +30,73 @@
                         Analyze New Document
                     </a>
                 </div>
-            @else
-                <div class="hidden md:grid grid-cols-12 gap-lg px-lg py-md bg-surface-container-low border-b border-outline-variant">
-                    <div class="col-span-6 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">File Name</div>
-                    <div class="col-span-2 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Date</div>
-                    <div class="col-span-2 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Status</div>
-                    <div class="col-span-2 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Progress / Risk</div>
-                </div>
+    @else
+        <!-- الهيدر المضبوط بـ 12 عموداً تماماً -->
+        <div class="hidden md:grid grid-cols-12 gap-lg px-lg py-md bg-surface-container-low border-b border-outline-variant">
+            <div class="col-span-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">File Name</div>
+            <div class="col-span-2 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Date</div>
+            <div class="col-span-2 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Status</div>
+            <div class="col-span-2 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Progress / Risk</div>
+            <div class="col-span-2 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Action</div>
+        </div>
 
-                <div class="divide-y divide-outline-variant">
-                    @foreach($documents as $doc)
-                        <div onclick="window.location.href='{{ $doc->status === 'done' ? route('documents.show', $doc) : route('documents.analyzing', $doc) }}'" 
-                             class="grid grid-cols-1 md:grid-cols-12 gap-md md:gap-lg px-lg py-md items-center hover:bg-surface-container-low transition-all cursor-pointer group">
-                            
-                            <div class="col-span-1 md:col-span-6 flex items-center gap-sm">
-                                <span class="material-symbols-outlined text-primary group-hover:scale-105 transition-transform">description</span>
-                                <span class="font-body-md text-body-md text-red font-semibold group-hover:underline truncate max-w-xs md:max-w-md">
-                                    {{ $doc->original_name }}
-                                </span>
-                            </div>
+        <div class="divide-y divide-outline-variant">
+            @foreach($documents as $doc)
+                <!-- تم ضبط الـ col-span هنا أيضاً ليناسب الهيدر -->
+                <div onclick="window.location.href='{{ $doc->status === 'done' ? route('documents.show', $doc) : route('documents.analyzing', $doc) }}'" 
+                     class="grid grid-cols-1 md:grid-cols-12 gap-md md:gap-lg px-lg py-md items-center hover:bg-surface-container-low transition-all cursor-pointer group">
+                    
+                    <!-- اسم الملف (4 أعمدة) -->
+                    <div class="col-span-1 md:col-span-4 flex items-center gap-sm">
+                        <span class="material-symbols-outlined text-primary group-hover:scale-105 transition-transform">description</span>
+                        <span class="font-body-md text-body-md text-red font-semibold group-hover:underline truncate max-w-xs md:max-w-md">
+                            {{ $doc->original_name }}
+                        </span>
+                    </div>
 
-                            <div class="col-span-1 md:col-span-2 flex items-center md:block">
-                                <span class="md:hidden font-label-md text-label-md text-on-surface-variant mr-2">Date:</span>
-                                <span class="font-body-sm text-body-sm text-on-surface-variant">
-                                    {{ $doc->created_at->format('M d, Y') }}
-                                </span>
-                            </div>
+                    <!-- التاريخ (عمودين) -->
+                    <div class="col-span-1 md:col-span-2 flex items-center md:block">
+                        <span class="md:hidden font-label-md text-label-md text-on-surface-variant mr-2">Date:</span>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">
+                            {{ $doc->created_at->format('M d, Y') }}
+                        </span>
+                    </div>
 
-                            <div class="col-span-1 md:col-span-2 flex items-center md:block">
-                                <span class="md:hidden font-label-md text-label-md text-on-surface-variant mr-2">Status:</span>
-                                @if($doc->status === 'done')
-                                    <span class="font-label-md text-label-md px-2 py-0.5 bg-success-container/30 text-success rounded border border-success/20">Completed</span>
-                                @elseif($doc->status === 'failed')
-                                    <span class="font-label-md text-label-md px-2 py-0.5 bg-error-container/30 text-error rounded border border-error/20">Failed</span>
-                                @else
-                                    <span class="font-label-md text-label-md px-2 py-0.5 bg-warning-container/30 text-warning rounded border border-warning/20 animate-pulse">Processing</span>
-                                @endif
-                            </div>
+                    <!-- الحالة (عمودين) -->
+                    <div class="col-span-1 md:col-span-2 flex items-center md:block">
+                        <span class="md:hidden font-label-md text-label-md text-on-surface-variant mr-2">Status:</span>
+                        @if($doc->status === 'done')
+                            <span class="font-label-md text-label-md px-2 py-0.5 bg-success-container/30 text-success rounded border border-success/20">Completed</span>
+                        @elseif($doc->status === 'failed')
+                            <span class="font-label-md text-label-md px-2 py-0.5 bg-error-container/30 text-error rounded border border-error/20">Failed</span>
+                        @else
+                            <span class="font-label-md text-label-md px-2 py-0.5 bg-warning-container/30 text-warning rounded border border-warning/20 animate-pulse">Processing</span>
+                        @endif
+                    </div>
 
-                            <div class="col-span-1 md:col-span-2 flex items-center justify-end">
-                                <span class="font-body-sm text-body-sm text-on-surface-variant mr-3 md:hidden">Progress</span>
-                                <div class="flex items-center gap-sm">
-                                    <span class="font-label-md text-label-md text-on-surface-variant text-xs">{{ $doc->progress }}%</span>
-                                    <div class="w-3 h-3 rounded-full {{ $doc->progress == 100 ? 'bg-[#10b981]' : 'bg-[#f59e0b]' }}" title="Progress: {{ $doc->progress }}%"></div>
-                                </div>
-                            </div>
-
+                    <!-- التقدم (عمودين) -->
+                    <div class="col-span-1 md:col-span-2 flex items-center md:justify-end">
+                        <span class="font-body-sm text-body-sm text-on-surface-variant mr-3 md:hidden">Progress</span>
+                        <div class="flex items-center gap-sm">
+                            <span class="font-label-md text-label-md text-on-surface-variant text-xs">{{ $doc->progress }}%</span>
+                            <div class="w-3 h-3 rounded-full {{ $doc->progress == 100 ? 'bg-[#10b981]' : 'bg-[#f59e0b]' }}" title="Progress: {{ $doc->progress }}%"></div>
                         </div>
-                    @endforeach
+                    </div>
+
+                    <!-- عمود الأكشن الجديد (عمودين) -->
+                    <div class="col-span-1 md:col-span-2 flex items-center justify-end" onclick="event.stopPropagation();">
+                        <form action="{{ route('documents.destroy', $doc) }}" method="POST" onsubmit="return confirm('هل أنت متأكد من حذف هذا الملف نهائياً؟');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="flex items-center gap-xs text-error hover:bg-error-container/20 px-2 py-1 rounded transition-colors text-sm font-medium">
+                                <span class="material-symbols-outlined text-base">delete</span>
+                            </button>
+                        </form>
+                    </div>
+
                 </div>
+            @endforeach
+        </div>
 
                 <div class="px-lg py-md bg-surface-container-low border-t border-outline-variant flex items-center justify-between">
                     <span class="font-body-sm text-body-sm text-on-surface-variant">
