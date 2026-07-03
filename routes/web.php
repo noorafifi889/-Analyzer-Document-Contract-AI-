@@ -19,18 +19,18 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-Route::get('/history', [DocumentController::class, 'history'])->name('documents.history');
 
-Route::get('/documents/{id}', [DocumentController::class, 'show'])->name('documents.show');
+// === جميع رواتس المستندات محمية وهيكلها مرتب وبدون أي تكرار ===
 Route::middleware('auth')->group(function () {
     
-    // الرواتس الإضافية الخاصة بك (ضعها قبل الـ show لتجنب أي تضارب في قراءة الـ URL)
-    Route::get('/documents/{document}/analyzing', [DocumentController::class, 'analyzing'])->name('documents.analyzing');
-    Route::get('/documents/{document}/status', [DocumentController::class, 'status'])->name('documents.status');
+    // 1. روت التاريخ (History)
+    Route::get('/documents/history', [DocumentController::class, 'history'])->name('documents.history');
 
-    // الـ Resource الكامل أصبح الآن محمياً بالـ auth ومسؤول عن (index, create, store, show, edit, update, destroy)
+    // 2. رواتس الانتظار والحالة الفنية (يجب أن تكون قبل الـ Resource حتى لا يعتبرها الـ Resource جزءاً من الـ ID)
+    Route::get('/documents/{document}/analyzing', [DocumentController::class, 'analyzing'])->name('documents.analyzing');
+    Route::get('/documents/{document}/status', [DocumentController::class, 'getStatus'])->name('documents.status');
+
+    // 3. الـ Resource الكامل (يتكفل  index, create, store, show, edit, update, destroy) تلقائياً بصيغة {document}
     Route::resource('documents', DocumentController::class);
     
 });
-
-Route::get('/documents/{document}/status', [DocumentController::class, 'getStatus'])->name('documents.status');
