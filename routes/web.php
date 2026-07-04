@@ -39,3 +39,6 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/documents/{document}/chat', [AiChatController::class, 'show'])->name('documents.chat');
 Route::post('/documents/{document}/chat/send', [AiChatController::class, 'sendMessage'])->name('documents.chat.send');
+
+
+Route::get('/documents/{document}/export-pdf', [DocumentController::class, 'exportPdf'])->name('documents.export-pdf');
