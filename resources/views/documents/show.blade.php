@@ -29,11 +29,10 @@
                         class="font-semibold text-on-surface">{{ $document->original_name }}</span> for compliance.</p>
             </div>
             <div class="flex gap-sm">
-                <button
-                    class="px-md py-sm border border-outline-variant rounded-lg font-semibold hover:bg-white transition-all flex items-center gap-xs">
-                    <span class="material-symbols-outlined text-[18px]">smart_toy</span>
-                    Chat with AI
-                </button>
+         <a href="{{ route('documents.chat', $document->id) }}" class="px-md py-sm border border-outline-variant rounded-lg font-semibold bg-surface-container-low hover:bg-white transition-all flex items-center gap-xs text-body-md">
+    <span class="material-symbols-outlined text-[18px]">smart_toy</span>
+    Chat with AI
+</a>
                 <button
                     class="px-md py-sm bg-primary text-on-primary rounded-lg font-semibold hover:opacity-90 transition-opacity">
                     Share Report
