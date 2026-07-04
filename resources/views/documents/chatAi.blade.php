@@ -23,15 +23,22 @@
  
         <!-- Left Column: Extracted Text Document Viewer -->
         <section class="hidden lg:flex flex-col w-2/5 bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm">
-            <div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
-                <h2 class="font-headline-sm text-headline-sm text-on-surface truncate max-w-[250px]">
-                    {{ $document->original_name ?? $document->name ?? 'Uploaded File' }}
-                </h2>
-                <div class="flex gap-sm">
-                    <span class="material-symbols-outlined text-on-surface-variant cursor-pointer select-none" data-icon="zoom_in">zoom_in</span>
-                    <span class="material-symbols-outlined text-on-surface-variant cursor-pointer select-none" data-icon="zoom_out">zoom_out</span>
-                </div>
-            </div>
+    <div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+    <div class="flex items-center gap-sm min-w-0">
+        <a href="{{ route('documents.show', $document) }}"
+           class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container transition-colors shrink-0"
+           title="Back to Document">
+            <span class="material-symbols-outlined text-on-surface-variant">arrow_back</span>
+        </a>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface truncate max-w-[200px]">
+            {{ $document->original_name ?? $document->name ?? 'Uploaded File' }}
+        </h2>
+    </div>
+    <div class="flex gap-sm shrink-0">
+        <span class="material-symbols-outlined text-on-surface-variant cursor-pointer select-none" data-icon="zoom_in">zoom_in</span>
+        <span class="material-symbols-outlined text-on-surface-variant cursor-pointer select-none" data-icon="zoom_out">zoom_out</span>
+    </div>
+</div>
             <div class="p-xl chat-scroll overflow-y-auto bg-surface-dim/20 flex-grow">
                 <div class="space-y-xl text-on-surface-variant">
                     <div class="bg-surface-container-lowest p-xl shadow-sm border border-outline-variant min-h-[800px] whitespace-pre-wrap text-body-md leading-relaxed">
