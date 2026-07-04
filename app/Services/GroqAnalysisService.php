@@ -1,65 +1,76 @@
 <?php
- 
+
 namespace App\Services;
- 
+
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Exception;
- 
+
 class GroqAnalysisService
 {
     protected string $apiKey;
+
     protected string $apiUrl;
+
     protected string $model;
- 
+
     public function __construct()
     {
         $this->apiKey = config('services.groq.key')
             ?? throw new Exception('Groq API key is not configured. تأكد من GROQ_API_KEY بملف .env');
- 
+
         $this->apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
- 
+
         // نموذج قوي وسريع من Groq، يدعم JSON mode
         $this->model = 'llama-3.3-70b-versatile';
     }
- 
+
     /**
      * Analyze any document text using Groq API.
      * Adapts its analysis style based on the detected document type
      * (legal contract, financial report, academic paper, general text, etc.)
      *
-     * @param string $text
-     * @return array
      * @throws Exception
      */
     public function analyzeContract(string $text): array
     {
-     $systemPrompt = <<<PROMPT
-You are an expert document analyst capable of analyzing ANY type of document. First, identify the type/nature of the document and detect its primary language (e.g., English, Arabic, etc.). Tailor your entire analysis and write all text fields in that SAME detected language. Return the result strictly in JSON format. Do not include any additional commentary or markdown block fences.
+        $systemPrompt = <<<'PROMPT'
+You are an expert document analyst and legal counsel. Your job is to strictly analyze the provided document text and respond based on the following rules:
 
-CRITICAL INSTRUCTION FOR SUMMARY FIELDS:
-You MUST provide a detailed, elongated analysis split into two distinct fields. Write all text responses in the detected language of the input document. Do not write short sentences; expand your vocabulary to provide a rich, professional, and deep evaluation.
-- "summary_p1": A detailed paragraph (4-5 long sentences) explaining the document's type, background, parties involved, and its core purpose.
-- "summary_p2": A detailed paragraph (4-5 long sentences) highlighting the primary obligations, potential liabilities/hidden risks, and conclusive expert feedback.
+1. LANGUAGE STRICTNESS:
+- Detect the primary language of the input document (e.g., Arabic, English).
+- You MUST write EVERY SINGLE TEXT VALUE in the JSON response using that EXACT detected language. 
+- If the document is in Arabic, all responses must be in professional Arabic. If in English, all responses must be in professional English.
 
-Required JSON Schema:
+2. LENGTH & DEPTH CRITERIA (CRITICAL):
+- For the "summary" field, you must write a massive, highly detailed, extensive, and elongated analysis paragraph.
+- This paragraph MUST be at least 5 to 8 full lines of text (deep analysis, rich vocabulary, fully expanded sentences). Avoid short or summarized answers.
+
+Required JSON Schema format:
 {
-  "summary_p1": "Detailed corporate paragraph 1 written in the document's language...",
-  "summary_p2": "Detailed corporate paragraph 2 written in the document's language...",
-  "risk_score": An integer from 0 to 100 representing the overall risk/concern level,
-  "critical_issues": ["Key issue 1 in the document's language", "Key issue 2"],
+"summary": "A massive, comprehensive, and highly detailed paragraph written ENTIRELY in the document's detected language. It MUST contain between 150 to 250 words of deep analytical text covering the document type, background, parties, purpose, core obligations, and potential legal/financial risks.",
+  "risk_score": An integer from 0 to 100 representing the overall risk level,
+  "critical_issues": [
+    "Critical issue 1 written in the document's language",
+    "Critical issue 2 written in the document's language"
+  ],
   "clauses_analysis": [
-    {"clause": "Section/Clause Name", "analysis": "Detailed analysis in the document's language"}
+    {
+      "clause": "Name of the section/clause (translated to the document's language)",
+      "analysis": "Extremely detailed analysis of this specific clause written in the document's language"
+    }
   ],
   "ai_confidence": A float between 0.0 and 1.0
 }
+
+Return ONLY the raw JSON object. Absolutely no markdown wrap (do not use ```json), no intro, and no outro commentary.
 PROMPT;
- 
+
         try {
             $response = Http::withHeaders([
-                    'Authorization' => 'Bearer ' . $this->apiKey,
-                    'Content-Type'  => 'application/json',
-                ])
+                'Authorization' => 'Bearer '.$this->apiKey,
+                'Content-Type' => 'application/json',
+            ])
                 ->timeout(60)
                 ->post($this->apiUrl, [
                     'model' => $this->model,
@@ -67,31 +78,33 @@ PROMPT;
                         ['role' => 'system', 'content' => $systemPrompt],
                         ['role' => 'user', 'content' => $text],
                     ],
-                    'temperature' => 0.2,
+                    'temperature' => 0.1, // لضمان دقة الالتزام بالقواعد والـ JSON وطول السطور
                     'response_format' => ['type' => 'json_object'],
                 ]);
- 
+
             if ($response->failed()) {
-                throw new Exception('Groq API call failed: ' . $response->body());
+                throw new Exception('Groq API call failed: '.$response->body());
             }
- 
+
             $result = $response->json();
             $rawText = $result['choices'][0]['message']['content'] ?? null;
- 
-            if (!$rawText) {
+
+            if (! $rawText) {
                 throw new Exception('Groq response did not contain valid text.');
             }
- 
-            $parsed = json_decode($rawText, true);
- 
+
+            // تنظيف أي علامات غريبة للماركدوان قد تعود من السيرفر بالخطأ بالرغم من الـ JSON mode
+            $cleanText = preg_replace('/^```json\s*|```$/i', '', trim($rawText));
+            $parsed = json_decode($cleanText, true);
+
             if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new Exception('Failed to decode Groq JSON response: ' . json_last_error_msg());
+                throw new Exception('Failed to decode Groq JSON response: '.json_last_error_msg());
             }
- 
+
             return $parsed;
- 
+
         } catch (Exception $e) {
-            Log::error('Groq Analysis Error: ' . $e->getMessage());
+            Log::error('Groq Analysis Error: '.$e->getMessage());
             throw $e;
         }
     }
