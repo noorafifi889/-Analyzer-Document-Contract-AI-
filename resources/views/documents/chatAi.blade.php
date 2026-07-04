@@ -1,3 +1,21 @@
+
+@php
+    $riskScore = $analysis->risk_score ?? null;
+
+    if (is_null($riskScore)) {
+        $riskLabel = 'Not Analyzed';
+        $riskClass = 'text-on-surface-variant';
+    } elseif ($riskScore > 70) {
+        $riskLabel = 'High Risk';
+        $riskClass = 'text-error';
+    } elseif ($riskScore > 40) {
+        $riskLabel = 'Medium Risk';
+        $riskClass = 'text-warning';
+    } else {
+        $riskLabel = 'Low Risk';
+        $riskClass = 'text-success';
+    }
+@endphp
 <x-layouts.app>
     <x-slot:title>AI Document Core - Analysis Center</x-slot:title>
 
@@ -33,10 +51,12 @@
                         <span class="material-symbols-outlined">shield</span>
                     </div>
                     <div>
-                        <p class="text-body-sm font-label-md text-on-surface-variant uppercase tracking-wider text-xs">Risk Matrix</p>
-                        <p class="font-bold {{ ($document->risk_score ?? 0) > 60 ? 'text-error' : 'text-success' }}">
-                            {{ ($document->risk_score ?? 0) > 60 ? 'Attention Required' : 'Low Risk Profile' }}
-                        </p>
+<div>
+    <p class="text-body-sm font-label-md text-on-surface-variant uppercase tracking-wider text-xs">Risk Matrix</p>
+    <p class="font-bold {{ $riskClass }}">
+        {{ $riskLabel }}
+    </p>
+</div>
                     </div>
                 </div>
                 

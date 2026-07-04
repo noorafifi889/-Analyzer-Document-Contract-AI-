@@ -15,8 +15,10 @@ class AiChatController extends Controller
      */
     public function show(Document $document)
     {
-        $chats = $document->aiChats()->oldest()->get();
-        return view('documents.chatAi', compact('document', 'chats'));
+      $chats = $document->aiChats()->oldest()->get();
+    $analysis = $document->analyses()->latest()->first();
+
+    return view('documents.chatAi', compact('document', 'chats', 'analysis'));
     }
 
     /**
