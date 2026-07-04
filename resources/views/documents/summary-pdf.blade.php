@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ $document->original_name }} - Summary</title>
+    <style>
+        @page {
+            margin: 30px 40px;
+        }
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            color: #1e293b;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .header {
+            border-bottom: 3px solid #4f46e5;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 20px;
+            color: #4f46e5;
+            margin: 0 0 4px 0;
+        }
+        .header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 12px;
+        }
+        .meta-grid {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .meta-grid td {
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            width: 25%;
+        }
+        .meta-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #64748b;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .meta-value {
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .risk-high { color: #dc2626; }
+        .risk-medium { color: #d97706; }
+        .risk-low { color: #16a34a; }
+ 
+        .section-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #1e293b;
+            margin: 24px 0 10px 0;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .summary-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 14px;
+            white-space: pre-line;
+        }
+        .clause-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+        }
+        .clause-item .clause-title {
+            font-weight: bold;
+            color: #4f46e5;
+            font-size: 12px;
+        }
+        .clause-item .clause-analysis {
+            font-size: 11px;
+            color: #475569;
+            margin-top: 4px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 10px;
+            color: #94a3b8;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+ 
+    <div class="header">
+        <h1>LexiGuard AI — Contract Summary Report</h1>
+        <p>{{ $document->original_name }}</p>
+    </div>
+ 
+    @php
+        $riskScore = $analysis->risk_score ?? null;
+        if (is_null($riskScore)) {
+            $riskLabel = 'Not Analyzed';
+            $riskClass = '';
+        } elseif ($riskScore > 70) {
+            $riskLabel = 'High Risk';
+            $riskClass = 'risk-high';
+        } elseif ($riskScore > 40) {
+            $riskLabel = 'Medium Risk';
+            $riskClass = 'risk-medium';
+        } else {
+            $riskLabel = 'Low Risk';
+            $riskClass = 'risk-low';
+        }
+    @endphp
+ 
+    <table class="meta-grid">
+        <tr>
+            <td>
+                <span class="meta-label">Uploaded Date</span>
+                <span class="meta-value">{{ $document->created_at->format('M d, Y') }}</span>
+            </td>
+            <td>
+                <span class="meta-label">Risk Score</span>
+                <span class="meta-value {{ $riskClass }}">{{ $riskScore ?? 'N/A' }}/100 ({{ $riskLabel }})</span>
+            </td>
+            <td>
+                <span class="meta-label">Critical Issues</span>
+                <span class="meta-value">{{ $analysis->critical_issues ?? 0 }} Issues</span>
+            </td>
+            <td>
+                <span class="meta-label">Status</span>
+                <span class="meta-value">{{ strtoupper($document->status) }}</span>
+            </td>
+        </tr>
+    </table>
+ 
+    <div class="section-title">Executive Summary</div>
+    <div class="summary-box">
+        {{ $analysis->summary ?? 'No summary available for this document.' }}
+    </div>
+ 
+    @if(!empty($analysis->risk_reason))
+        <div class="section-title">Risk Reasoning</div>
+        <div class="summary-box">
+            {{ $analysis->risk_reason }}
+        </div>
+    @endif
+ 
+    @if(!empty($analysis->clauses_analysis))
+        <div class="section-title">Key Clauses</div>
+        @foreach($analysis->clauses_analysis as $item)
+            <div class="clause-item">
+                <div class="clause-title">{{ $item['clause'] ?? 'Clause' }}</div>
+                <div class="clause-analysis">{{ $item['analysis'] ?? '' }}</div>
+            </div>
+        @endforeach
+    @endif
+ 
+    <div class="footer">
+        Generated by LexiGuard AI on {{ now()->format('M d, Y — h:i A') }} · This report is AI-generated and should not replace professional legal advice.
+    </div>
+ 
+</body>
+</html>
+ 
