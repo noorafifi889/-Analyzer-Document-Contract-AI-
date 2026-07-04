@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\AnalyzeDocumentJob;
 use App\Models\Document;
 use Illuminate\Http\Request;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 class DocumentController extends Controller
 {
   public function store(Request $request)
@@ -103,4 +103,17 @@ class DocumentController extends Controller
             'progress' => $document->progress,  // سيعود بـ 20، 50، 90، أو 100
         ]);
     }
+
+    public function exportPdf(Document $document)
+{
+    $analysis = $document->analyses()->latest()->first();
+ 
+    $pdf = Pdf::loadView('documents.summary-pdf', compact('document', 'analysis'))
+        ->setPaper('a4', 'portrait');
+ 
+    $fileName = \Illuminate\Support\Str::slug($document->original_name ?? 'document-summary') . '-summary.pdf';
+ 
+    return $pdf->download($fileName);
+}
+ 
 }
