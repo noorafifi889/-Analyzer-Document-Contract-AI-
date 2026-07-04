@@ -189,8 +189,7 @@
                             </p>
                         @endforelse
                     </div>
-                    <button class="w-full mt-md py-sm text-primary font-semibold text-body-sm hover:underline">View
-                        Detailed Breakdown</button>
+                  
                 </div>
             </div>
         </div>
