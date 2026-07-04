@@ -33,10 +33,11 @@
     <span class="material-symbols-outlined text-[18px]">smart_toy</span>
     Chat with AI
 </a>
-                <button
-                    class="px-md py-sm bg-primary text-on-primary rounded-lg font-semibold hover:opacity-90 transition-opacity">
-                    Share Report
-                </button>
+               <a href="{{ route('documents.export-pdf', $document) }}"
+   class="px-md py-sm bg-primary text-on-primary rounded-lg font-semibold hover:opacity-90 transition-opacity flex items-center gap-xs">
+    <span class="material-symbols-outlined text-[18px]">download</span>
+    Export PDF
+</a>
             </div>
         </section>
 
