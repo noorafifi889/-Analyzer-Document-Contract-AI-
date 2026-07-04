@@ -261,6 +261,7 @@
         </div>
     </footer>
 
+    @stack('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const uploadBtn = document.querySelector('.upload-gradient');
