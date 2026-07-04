@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -34,3 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('documents', DocumentController::class);
     
 });
+
+
+Route::get('/documents/{document}/chat', [AiChatController::class, 'show'])->name('documents.chat');
+Route::post('/documents/{document}/chat/send', [AiChatController::class, 'sendMessage'])->name('documents.chat.send');
