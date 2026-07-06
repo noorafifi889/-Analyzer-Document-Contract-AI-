@@ -116,15 +116,15 @@
                     </div>
  
                     <!-- Welcome Box -->
-                    <div class="flex items-start gap-md max-w-[85%]">
+                    {{-- <div class="flex items-start gap-md max-w-[85%]">
                         <div class="w-8 h-8 rounded-full bg-primary-container flex-shrink-0 flex items-center justify-center">
                             <span class="material-symbols-outlined text-on-primary-container text-sm">smart_toy</span>
                         </div>
-                        <div class="bg-surface-container-low text-on-surface-variant p-md rounded-xl rounded-tl-none border border-outline-variant/30">
+                        {{-- <div class="bg-surface-container-low text-on-surface-variant p-md rounded-xl rounded-tl-none border border-outline-variant/30">
                             <p class="text-body-md">I have successfully mapped the text converted from your uploaded file. Ask me any direct questions, and I will answer directly using the file's data pool.</p>
-                        </div>
-                    </div>
- 
+                        </div> --}}
+                    {{-- </div> --}}
+  {{-- --}} -
                     <!-- Historical Database Renders -->
                     @foreach($chats as $chat)
                         <!-- User Chat Row -->
