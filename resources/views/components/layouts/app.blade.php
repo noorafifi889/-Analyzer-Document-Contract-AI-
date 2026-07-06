@@ -174,66 +174,78 @@
                     LexiGuard AI
                 </div>
                 <nav class="hidden md:flex items-center space-x-lg font-body-md text-body-md">
-                    <a class="text-on-surface-variant hover:text-primary transition-colors" href="{{ route('dashboard') }}">Documents</a>
-<a class="text-on-surface-variant hover:text-primary transition-colors" href="{{ route('documents.history') }}">History</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors"
+                        href="{{ route('dashboard') }}">Documents</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors"
+                        href="{{ route('documents.history') }}">History</a>
                     <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Templates</a>
                 </nav>
-@auth
-    <div class="relative flex items-center gap-sm">
-        
-        <button onclick="document.getElementById('userDropdown').classList.toggle('hidden'); document.getElementById('dropdownArrow').classList.toggle('rotate-180'); event.stopPropagation();" 
-                class="flex items-center gap-sm hover:bg-surface-container-low p-xs rounded-lg transition-all focus:outline-none">
-            
-            <span class="font-body-sm text-body-sm text-on-surface font-medium select-none">
-                {{ auth()->user()->name }}
-            </span>
-            
-            <div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container overflow-hidden border border-outline-variant flex items-center justify-center font-label-md text-label-md">
-                {{ substr(auth()->user()->name, 0, 2) }}
-            </div>
+                @auth
+                    <div class="relative flex items-center gap-sm">
 
-            <span id="dropdownArrow" class="material-symbols-outlined text-[18px] text-on-surface-variant transition-transform duration-200">keyboard_arrow_down</span>
-        </button>
-        
-        <div id="userDropdown" class="hidden absolute left-0 top-full mt-xs w-48 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg py-sm z-[999] min-w-[200px]">
-            
-            <div class="px-md py-xs border-b border-outline-variant/50 mb-xs">
-                <p class="font-body-sm text-body-sm text-on-surface font-semibold truncate">{{ auth()->user()->name }}</p>
-                <p class="text-[12px] text-on-surface-variant truncate">{{ auth()->user()->email }}</p>
-            </div>
+                        <button
+                            onclick="document.getElementById('userDropdown').classList.toggle('hidden'); document.getElementById('dropdownArrow').classList.toggle('rotate-180'); event.stopPropagation();"
+                            class="flex items-center gap-sm hover:bg-surface-container-low p-xs rounded-lg transition-all focus:outline-none">
 
-            <a href="#" class="flex items-center gap-sm px-md py-sm font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors">
-                <span class="material-symbols-outlined text-[18px]">settings</span>
-                Account Settings
-            </a>
+                            <span class="font-body-sm text-body-sm text-on-surface font-medium select-none">
+                                {{ auth()->user()->name }}
+                            </span>
 
-            <form method="POST" action="{{ route('logout') }}" class="w-full">
-                @csrf
-                <button type="submit" class="w-full flex items-center gap-sm px-md py-sm font-body-sm text-body-sm text-error hover:bg-error-container/20 transition-colors text-left">
-                    <span class="material-symbols-outlined text-[18px]">logout</span>
-                    Log Out
-                </button>
-            </form>
-        </div>
-    </div>
+                            <div
+                                class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container overflow-hidden border border-outline-variant flex items-center justify-center font-label-md text-label-md">
+                                {{ substr(auth()->user()->name, 0, 2) }}
+                            </div>
 
-    <script>
-        // كود لإغلاق القائمة عند الضغط في أي مكان آخر على الشاشة
-        window.addEventListener('click', function(e) {
-            const dropdown = document.getElementById('userDropdown');
-            const arrow = document.getElementById('dropdownArrow');
-            if (dropdown && !dropdown.classList.contains('hidden')) {
-                dropdown.classList.add('hidden');
-                arrow.classList.remove('rotate-180');
-            }
-        });
-    </script>
-@else
-    <div class="flex items-center gap-sm">
-        <a href="{{ route('login') }}" class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors px-sm py-xs">Sign In</a>
-        <a href="{{ route('register') }}" class="font-body-sm text-body-sm bg-primary text-on-primary px-md py-xs rounded-lg hover:opacity-90 transition-all">Register</a>
-    </div>
-@endauth
+                            <span id="dropdownArrow"
+                                class="material-symbols-outlined text-[18px] text-on-surface-variant transition-transform duration-200">keyboard_arrow_down</span>
+                        </button>
+
+                        <div id="userDropdown"
+                            class="hidden absolute left-0 top-full mt-xs w-48 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg py-sm z-[999] min-w-[200px]">
+
+                            <div class="px-md py-xs border-b border-outline-variant/50 mb-xs">
+                                <p class="font-body-sm text-body-sm text-on-surface font-semibold truncate">
+                                    {{ auth()->user()->name }}</p>
+                                <p class="text-[12px] text-on-surface-variant truncate">{{ auth()->user()->email }}</p>
+                            </div>
+
+                            <a href="#"
+                                class="flex items-center gap-sm px-md py-sm font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">settings</span>
+                                Account Settings
+                            </a>
+
+                            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                                @csrf
+                                <button type="submit"
+                                    class="w-full flex items-center gap-sm px-md py-sm font-body-sm text-body-sm text-error hover:bg-error-container/20 transition-colors text-left">
+                                    <span class="material-symbols-outlined text-[18px]">logout</span>
+                                    Log Out
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <script>
+                        // كود لإغلاق القائمة عند الضغط في أي مكان آخر على الشاشة
+                        window.addEventListener('click', function(e) {
+                            const dropdown = document.getElementById('userDropdown');
+                            const arrow = document.getElementById('dropdownArrow');
+                            if (dropdown && !dropdown.classList.contains('hidden')) {
+                                dropdown.classList.add('hidden');
+                                arrow.classList.remove('rotate-180');
+                            }
+                        });
+                    </script>
+                @else
+                    <div class="flex items-center gap-sm">
+                        <a href="{{ route('login') }}"
+                            class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors px-sm py-xs">Sign
+                            In</a>
+                        <a href="{{ route('register') }}"
+                            class="font-body-sm text-body-sm bg-primary text-on-primary px-md py-xs rounded-lg hover:opacity-90 transition-all">Register</a>
+                    </div>
+                @endauth
             </div>
         </header>
     @endunless
