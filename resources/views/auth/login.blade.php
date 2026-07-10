@@ -66,21 +66,7 @@
                         Sign in
                     </button>
 
-                    <div class="relative flex items-center justify-center py-md">
-                        <div class="w-full border-t border-outline-variant"></div>
-                        <span class="absolute px-md bg-surface-container-lowest font-body-sm text-body-sm text-on-surface-variant">Or continue with</span>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-md">
-                        <button type="button" class="flex items-center justify-center gap-sm py-sm px-md border border-outline-variant rounded-lg hover:bg-surface-container-low transition-all">
-                            <img alt="Google" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCetEkdAfC3gZ6CTIOVEiLy26b9DrAbef4dXFOQMN5gL2bJpo1JgVEbsdPsEHwOHMCf2fIAs-GeM0xqle_UgT5uk19tLsATJBWz135FQM8ErmG9edzAcGAevNo3Qr5dkol-VeZD04C7GNTT_V_wC-aCRIuWGSqlTvmpWOcRrsa-JwwYLIiKJXzxEkO4_Zmd8NTQ1U0vzkd-Nhtb9z4MqPRwtx6FRYeMhCNVdZB_OCp3Rtp3ilOj0E9QdlHhuECOiPDyKgTqMhhNLKE"/>
-                            <span class="font-label-md text-label-md text-on-surface-variant">Google</span>
-                        </button>
-                        <button type="button" class="flex items-center justify-center gap-sm py-sm px-md border border-outline-variant rounded-lg hover:bg-surface-container-low transition-all">
-                            <svg class="w-5 h-5" viewbox="0 0 23 23" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h11v11H0z" fill="#f3f3f3"></path><path d="M12 0h11v11H12z" fill="#f3f3f3"></path><path d="M0 12h11v23H0z" fill="#f3f3f3" opacity=".8"></path><path d="M12 12h11v11H12z" fill="#f3f3f3"></path></svg>
-                            <span class="font-label-md text-label-md text-on-surface-variant">Microsoft</span>
-                        </button>
-                    </div>
+               
                 </form>
 
                 <p class="mt-xl text-center font-body-sm text-body-sm text-on-surface-variant">
