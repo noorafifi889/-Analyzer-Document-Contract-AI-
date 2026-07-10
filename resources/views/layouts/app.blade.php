@@ -42,9 +42,9 @@
         
         @include('layouts.partials.header')
 
-        <div class="p-margin-page max-w-[1440px] mx-auto space-y-10">
-            @yield('content')
-        </div>
+    <div class="mx-4 md:mx-10 mt-5 max-w-[1440px] space-y-10">
+    @yield('content')
+</div>
 
         {{-- @include('layouts.partials.footer') --}}
 
