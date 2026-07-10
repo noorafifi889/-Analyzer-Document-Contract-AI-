@@ -18,7 +18,7 @@ class DocumentController extends Controller
     $originalName = $request->file('document')->getClientOriginalName();
 
     // 2. التحقق مما إذا كان المستخدم الحالي قد رفع ملفاً بنفس الاسم سابقاً
-    $existingDocument = Document::where('user_id', auth()->id())
+    $existingDocument = Document::where('user_id', auth()->user->id())
                                 ->where('original_name', $originalName)
                                 ->first();
 
@@ -33,7 +33,7 @@ class DocumentController extends Controller
     $path = $request->file('document')->store('documents');
 
     $document = Document::create([
-        'user_id' => auth()->id(),
+        'user_id' => auth()->user->id(),
         'original_name' => $originalName,
         'title' => pathinfo($originalName, PATHINFO_FILENAME),
         'file_path' => $path,
@@ -50,7 +50,7 @@ class DocumentController extends Controller
     public function history()
     {
         // جلب مستندات المستخدم الحالي فقط وترتيبها من الأحدث للأقدم مع الترقيم (Pagination)
-        $documents = auth()->user()->documents()->latest()->paginate(10);
+        $documents = auth()->user->documents()->latest()->paginate(10);
 
         return view('documents.history', compact('documents'));
     }
@@ -81,14 +81,14 @@ class DocumentController extends Controller
 
     public function analyzing(Document $document)
     {
-        abort_unless($document->user_id === auth()->id(), 403);
+        abort_unless($document->user_id === auth()->user->id(), 403);
 
         return view('documents.analyzing', compact('document'));
     }
 
     public function status(Document $document)
     {
-        abort_unless($document->user_id === auth()->id(), 403);
+        abort_unless($document->user_id === auth()->user->id(), 403);
 
         return response()->json([
             'status' => $document->status,

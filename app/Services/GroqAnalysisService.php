@@ -93,7 +93,6 @@ PROMPT;
                 throw new Exception('Groq response did not contain valid text.');
             }
 
-            // تنظيف أي علامات غريبة للماركدوان قد تعود من السيرفر بالخطأ بالرغم من الـ JSON mode
             $cleanText = preg_replace('/^```json\s*|```$/i', '', trim($rawText));
             $parsed = json_decode($cleanText, true);
 
