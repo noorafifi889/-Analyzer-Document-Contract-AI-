@@ -50,7 +50,7 @@ class DocumentController extends Controller
     public function history()
     {
         // جلب مستندات المستخدم الحالي فقط وترتيبها من الأحدث للأقدم مع الترقيم (Pagination)
-        $documents = auth()->user->documents()->latest()->paginate(10);
+        $documents = auth()->user()->documents()->latest()->paginate(10);
 
         return view('documents.history', compact('documents'));
     }
