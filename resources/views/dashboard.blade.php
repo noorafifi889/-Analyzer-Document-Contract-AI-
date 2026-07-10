@@ -1,4 +1,4 @@
-<x-layouts.app>
+{{-- <x-layouts.app>
     <x-slot:title>
         LexiGuard AI - الصفحة الرئيسية
     </x-slot:title>
@@ -96,4 +96,71 @@
             }
         });
     </script>
-</x-layouts.app>
+</x-layouts.app> --}}
+
+@extends('layouts.app')
+
+@section('title', 'Dashboard - ContractGuard AI')
+
+@section('content')
+    <section class="flex justify-between items-end">
+        <div>
+            <h2 class="font-headline-lg text-headline-lg text-on-surface">Welcome back,      {{ auth()->user()->name }} </h2>
+            <p class="font-body-lg text-body-lg text-on-surface-variant mt-1">Here's what's happening with your legal workspace today.</p>
+        </div>
+        <div class="flex items-center gap-3 text-on-surface-variant bg-surface-container-low px-4 py-2 rounded-lg border border-outline-variant">
+            <span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+            <span class="font-label-md text-label-md font-bold">Oct 24, 2023 - Oct 31, 2023</span>-
+            <span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-2 bg-primary-fixed rounded-lg text-primary">
+                    <span class="material-symbols-outlined" data-icon="description">description</span>
+                </div>
+                <span class="text-primary font-bold text-label-sm">+4%</span>
+            </div>
+            <p class="font-label-md text-label-md text-on-surface-variant">Total Contracts</p>
+            <p class="font-headline-lg text-headline-lg font-extrabold mt-1">1,248</p>
+        </div>
+        
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-2 bg-error-container rounded-lg text-error">
+                    <span class="material-symbols-outlined" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
+                </div>
+                <span class="text-error font-bold text-label-sm">-2 active</span>
+            </div>
+            <p class="font-label-md text-label-md text-on-surface-variant">Active Risks</p>
+            <p class="font-headline-lg text-headline-lg font-extrabold mt-1">12</p>
+        </div>
+
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-2 bg-tertiary-fixed rounded-lg text-tertiary">
+                    <span class="material-symbols-outlined" data-icon="pending_actions">pending_actions</span>
+                </div>
+                <span class="text-tertiary font-bold text-label-sm">3 due soon</span>
+            </div>
+            <p class="font-label-md text-label-md text-on-surface-variant">Pending Renewals</p>
+            <p class="font-headline-lg text-headline-lg font-extrabold mt-1">5</p>
+        </div>
+
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-2 bg-secondary-fixed rounded-lg text-secondary">
+                    <span class="material-symbols-outlined" data-icon="monetization_on">monetization_on</span>
+                </div>
+                <span class="text-secondary font-bold text-label-sm">+$0.4M</span>
+            </div>
+            <p class="font-label-md text-label-md text-on-surface-variant">Total Value</p>
+            <p class="font-headline-lg text-headline-lg font-extrabold mt-1">$4.2M</p>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+        </section>
+@endsection
