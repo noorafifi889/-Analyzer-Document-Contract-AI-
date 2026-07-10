@@ -31,6 +31,10 @@ protected $fillable = [
         return $this->hasMany(Analysis::class);
     }
 
+    public function analysis(): HasOne
+{
+    return $this->hasOne(Analysis::class, 'document_id');
+}
     // Document hasMany AiChats
     public function aiChats(): HasMany
     {
