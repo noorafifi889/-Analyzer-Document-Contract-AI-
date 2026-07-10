@@ -18,7 +18,7 @@ class DocumentController extends Controller
     $originalName = $request->file('document')->getClientOriginalName();
 
     // 2. التحقق مما إذا كان المستخدم الحالي قد رفع ملفاً بنفس الاسم سابقاً
-    $existingDocument = Document::where('user_id', auth()->user->id())
+    $existingDocument = Document::where('user_id', auth()->id())
                                 ->where('original_name', $originalName)
                                 ->first();
 
@@ -81,14 +81,14 @@ class DocumentController extends Controller
 
     public function analyzing(Document $document)
     {
-        abort_unless($document->user_id === auth()->user->id(), 403);
+        abort_unless($document->user_id === auth()->id(), 403);
 
         return view('documents.analyzing', compact('document'));
     }
 
     public function status(Document $document)
     {
-        abort_unless($document->user_id === auth()->user->id(), 403);
+        abort_unless($document->user_id === auth()->id(), 403);
 
         return response()->json([
             'status' => $document->status,
