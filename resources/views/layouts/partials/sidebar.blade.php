@@ -9,11 +9,11 @@
         </div>
     </div>
     <nav class="flex-1 space-y-1">
-        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-primary font-bold bg-surface-container-low transition-colors duration-150" href="#">
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-primary font-bold bg-surface-container-low transition-colors duration-150" href=""{{ route('dashboard') }}">
             <span class="material-symbols-outlined" data-icon="dashboard" style="font-variation-settings: 'FILL' 1;">dashboard</span>
             <span class="font-label-md text-label-md">Dashboard</span>
         </a>
-        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150" href="#">
+        <a  class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150"       href="{{ route('documents.history') }}">
             <span class="material-symbols-outlined" data-icon="description">description</span>
             <span class="font-label-md text-label-md">Contracts</span>
         </a>
