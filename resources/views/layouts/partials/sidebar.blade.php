@@ -30,6 +30,12 @@
             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {{ request()->routeIs('intelligence.*') ? 1 : 0 }};">psychology</span>
             <span class="font-label-md text-label-md">Contract Intelligence</span>
         </a>
+               <a href="{{ route('settings.index') }}"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-150
+                  {{ request()->routeIs('settings.*') ? 'text-primary font-bold bg-surface-container-low' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
+            <span class="material-symbols-outlined">settings</span>
+                        <span class="font-label-md text-label-md">Settings</span>
+        </a>
 
         <div class="pt-8 pb-4">
             <p class="px-3 font-label-sm text-label-sm text-outline uppercase tracking-widest">Admin</p>

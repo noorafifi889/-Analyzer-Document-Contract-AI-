@@ -5,6 +5,7 @@ use App\Http\Controllers\ContractIntelligenceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SettingsController;
 use App\Models\Document;
 use Illuminate\Support\Facades\Route;
 
@@ -54,3 +55,18 @@ Route::get('/intelligence', [ContractIntelligenceController::class, 'index'])
 Route::get('/intelligence/{document}', [ContractIntelligenceController::class, 'show'])
     ->name('intelligence.show');
 
+
+
+    Route::prefix('settings')->name('settings.')->middleware(['auth'])->group(function () {
+    
+    // الصفحة الرئيسية للإعدادات (عرض الملف الشخصي)
+    Route::get('/', [SettingsController::class, 'index'])->name('index');
+    
+    // مسارات إضافية إذا قررت مستقبلاً فصل التبويبات إلى صفحات منفصلة أو طلبات Ajax
+    Route::get('/security', [SettingsController::class, 'security'])->name('security');
+    Route::get('/ai-preferences', [SettingsController::class, 'aiPreferences'])->name('ai');
+    Route::get('/notifications', [SettingsController::class, 'notifications'])->name('notifications');
+    
+    // مسار حفظ التعديلات (طلب POST عند الضغط على Save Preferences)
+    Route::post('/update', [SettingsController::class, 'update'])->name('update');
+});
