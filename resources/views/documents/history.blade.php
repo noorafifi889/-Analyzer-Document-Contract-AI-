@@ -49,7 +49,7 @@
                         $riskScore = $currentAnalysis ? $currentAnalysis->risk_score : null;
                     @endphp
                     
-                    <div onclick="window.location.href='{{ $doc->status === 'done' ? route('documents.show', $doc) : route('documents.analyzing', $doc) }}'"
+                    <div onclick="window.location.href='{{ $doc->status === 'done' ? route('intelligence.show', $doc) : route('intelligence.analyzing', $doc) }}'"
                          class="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 px-6 py-4 items-center hover:bg-surface-container-low/50 transition-all cursor-pointer group">
  
                         <div class="col-span-1 md:col-span-4 flex items-center gap-3">
