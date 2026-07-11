@@ -33,7 +33,7 @@ public function sendMessage(Request $request, Document $document)
     $contractContent = $document->extracted_text ?? '';
 
     // تقصير النص لتفادي rate_limit_exceeded (TPM limit)
-    $maxChars = 12000; // ≈ 3000 توكن تقريبًا
+    $maxChars = 12000;
     if (mb_strlen($contractContent) > $maxChars) {
         $contractContent = mb_substr($contractContent, 0, $maxChars)
             . "\n\n[...تم اقتطاع باقي النص بسبب حجم الطلب...]";
@@ -49,7 +49,12 @@ public function sendMessage(Request $request, Document $document)
                       . "1. For general greetings or casual chat (e.g., 'hi', 'how are you', 'شو أخبارك'), reply warmly in the user's language and remind them to ask questions about this specific document.\n"
                       . "2. For questions regarding the document, answer accurately, objectively, and professionally based ONLY on the extracted text provided above.\n"
                       . "3. If the user asks about information that does not exist in the text, or if the extracted text is empty, clearly state that the information cannot be found within the document context.\n"
-                      . "4. STRICT LANGUAGE MATCHING: Detect the language of the user's prompt. If they ask in Arabic, reply in Arabic. If they ask in English, reply in English.";
+                      . "4. STRICT LANGUAGE MATCHING: Detect the language of the user's prompt. If they ask in Arabic, reply in Arabic. If they ask in English, reply in English.\n\n"
+                      . "5. OUTPUT FORMAT (CRITICAL): You MUST respond with ONLY a raw JSON object, no markdown, no code fences, matching exactly this schema:\n"
+                      . "{\n"
+                      . "  \"answer\": \"Your full, professional answer in the appropriate language.\",\n"
+                      . "  \"quote\": \"An exact short excerpt (max ~25 words), copied VERBATIM word-for-word from the extracted document text above, that directly supports your answer. If this is a greeting/small talk or the document has no relevant text, return an empty string.\"\n"
+                      . "}";
 
         $response = Http::withToken(config('services.groq.key'))
             ->timeout(60)
@@ -61,6 +66,7 @@ public function sendMessage(Request $request, Document $document)
                 ],
                 'temperature' => 0.3,
                 'max_tokens' => 1024,
+                'response_format' => ['type' => 'json_object'],
             ]);
 
         if ($response->failed()) {
@@ -76,20 +82,26 @@ public function sendMessage(Request $request, Document $document)
         }
 
         $aiData = $response->json();
-        $aiResponse = $aiData['choices'][0]['message']['content'] ?? 'Unable to parse an answer from the document context.';
+        $rawContent = $aiData['choices'][0]['message']['content'] ?? null;
+
+        $parsed = json_decode($rawContent, true);
+        $aiResponse = $parsed['answer'] ?? ($rawContent ?: 'Unable to parse an answer from the document context.');
+        $sourceQuote = trim($parsed['quote'] ?? '');
 
         $chat = AiChat::create([
-            'document_id' => $document->id,
-            'user_id' => auth()->id(),
-            'message' => $request->message,
-            'response' => $aiResponse,
+            'document_id'   => $document->id,
+            'user_id'       => auth()->id(),
+            'message'       => $request->message,
+            'response'      => $aiResponse,
+            'source_quote'  => $sourceQuote ?: null,
         ]);
 
         return response()->json([
-            'success' => true,
-            'message' => $chat->message,
+            'success'  => true,
+            'message'  => $chat->message,
             'response' => $chat->response,
-            'time' => $chat->created_at->format('h:i A')
+            'quote'    => $chat->source_quote,
+            'time'     => $chat->created_at->format('h:i A')
         ]);
 
     } catch (\Exception $e) {
