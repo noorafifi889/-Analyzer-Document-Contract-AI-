@@ -227,7 +227,7 @@
             <p class="text-outline italic text-center py-12">No extracted text is available for this document.</p>
         @endif
     </div>
-</section>>
+</section>
 
                 {{-- B) Analytics intelligence panel --}}
                 <section class="w-[390px] flex-1 border-l border-outline-variant bg-surface-container-lowest flex flex-col overflow-y-auto shrink-0 p-6 space-y-6 scrollbar-none shadow-sm relative z-10">
