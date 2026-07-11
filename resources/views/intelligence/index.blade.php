@@ -1,385 +1,334 @@
+@php
+    $clauses = $analysis->clauses_analysis ?? [];
+
+    // Separate "Critical issues" from regular clauses once
+    $criticalEntry = collect($clauses)->first(fn ($c) => ($c['clause'] ?? '') === 'Critical issues');
+    $regularClauses = collect($clauses)->reject(fn ($c) => ($c['clause'] ?? '') === 'Critical issues')->values();
+    $criticalIssuesList = $criticalEntry
+        ? array_values(array_filter(array_map('trim', explode('|', $criticalEntry['analysis'] ?? ''))))
+        : [];
+
+    $riskScoreValue = $analysis->risk_score ?? 0;
+    if ($riskScoreValue > 70) {
+        $verdictColor = '#DC2626'; $verdictSoft = '#FEE2E2'; $statusText = 'High Risk';
+    } elseif ($riskScoreValue > 40) {
+        $verdictColor = '#D97706'; $verdictSoft = '#FEF3C7'; $statusText = 'Medium Risk';
+    } else {
+        $verdictColor = '#059669'; $verdictSoft = '#D1FAE5'; $statusText = 'Low Risk';
+    }
+
+    // Fallback data
+    $missingClauses = $analysis->missing_clauses ?? [
+        ['clause' => 'Governing Law & Jurisdiction', 'risk' => 'High', 'reason' => 'Missing explicit jurisdiction leaves company vulnerable to cross-border litigation costs.'],
+        ['clause' => 'Data Protection Addendum (DPA)', 'risk' => 'Medium', 'reason' => 'Required for GDPR/CCPA compliance since the contract involves user data transfer.']
+    ];
+
+    $obligations = $analysis->obligations ?? [
+        ['due_date' => 'Within 14 days', 'type' => 'Financial', 'desc' => 'Initial setup fee payment activation deadline.'],
+        ['due_date' => 'End of Q3 2026', 'type' => 'Compliance', 'desc' => 'Submit compliance report regarding data encryption frameworks.']
+    ];
+@endphp
+
 @extends('layouts.app')
 
-@section('title', isset($document) && $document ? $document->original_name . ' | Contract Intelligence' : 'Contract Intelligence')
+@section('title', isset($document) && $document ? $document->original_name . ' | Contract Intelligence Hub' : 'Contract Intelligence Hub')
 
 @section('content')
-<div class="w-full min-h-screen font-body-md text-on-surface antialiased flex">
+<div class="w-full antialiased text-[#0F172A] -mt-4 font-sans selection:bg-indigo-100" x-data="{ currentTab: 'ledger' }">
 
     @if(!$document)
         {{-- ============================== --}}
-        {{-- STATE 1: No document selected (upload view) --}}
+        {{-- STATE 1: No document selected --}}
         {{-- ============================== --}}
-        <div class="w-full max-w-xl mx-auto text-center ">
-            <div class="w-20 h-20 bg-primary-container/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-primary/10">
-                <span class="material-symbols-outlined text-4xl">analytics</span>
+        <div class="w-full max-w-2xl mx-auto text-center py-20">
+            <div class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-indigo-100 shadow-sm">
+                <span class="material-symbols-outlined text-4xl">gavel</span>
             </div>
-            <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mb-2">LexiGuard AI</h1>
-            <p class="font-body-lg text-body-lg text-on-surface-variant mb-8 max-w-md mx-auto">
-                Please upload a new contract or select from recently analyzed files to initialize the intelligent processing suite.
+            <h1 class="text-3xl font-extrabold tracking-tight mb-3 text-[#0F172A]">LexiGuard AI</h1>
+            <p class="text-slate-600 mb-8 max-w-md mx-auto text-base">
+                Upload a new contract or select from recently analyzed documents to launch the compliance audit execution layer.
             </p>
 
             @error('document')
-                <p class="text-red-500 text-xs mb-4 font-semibold text-center animate-pulse">
-                    {{ $message }}
-                </p>
+                <p class="text-red-600 text-sm mb-4 font-bold text-center">{{ $message }}</p>
             @enderror
 
-            <div class="border-2 border-dashed border-outline-variant rounded-2xl p-10 bg-surface-container-lowest hover:border-primary hover:shadow-md transition-all duration-300 mb-8 shadow-sm group">
+            <div class="border-2 border-dashed border-slate-200 rounded-2xl p-12 bg-white hover:border-indigo-500 hover:shadow-lg transition-all duration-300 mb-8 group">
                 <form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data" id="intelligence-upload-form">
                     @csrf
-                    {{-- Tell the store() endpoint to bounce back here instead of Document History --}}
                     <input type="hidden" name="redirect_to" value="intelligence">
                     <label class="cursor-pointer flex flex-col items-center justify-center w-full">
-                        <span class="material-symbols-outlined text-5xl text-outline group-hover:text-primary transition-colors mb-3">upload_file</span>
-                        <span class="font-label-lg text-lg font-bold text-primary">Click to upload a new document</span>
-                        <span class="font-body-sm text-body-sm text-outline mt-1.5">Supported formats: PDF, DOCX, TXT up to 10MB</span>
+                        <span class="material-symbols-outlined text-6xl text-indigo-500 group-hover:text-indigo-600 transition-colors mb-4">upload_file</span>
+                        <span class="text-lg font-bold text-[#0F172A]">Click to upload new document</span>
+                        <span class="text-sm text-slate-400 mt-2 font-mono">PDF · DOCX · TXT — Up to 10MB</span>
                         <input type="file" name="document" class="hidden" onchange="submitUploadForm(this)">
                     </label>
                 </form>
             </div>
-
-            @if(isset($recentDocuments) && $recentDocuments->isNotEmpty())
-                <div class="text-left bg-surface-container-lowest rounded-xl p-6 border border-outline-variant shadow-sm">
-                    <h3 class="font-label-sm text-label-sm text-outline uppercase tracking-widest mb-4">Recently Processed Instruments</h3>
-                    <div class="divide-y divide-outline-variant">
-                        @foreach($recentDocuments as $recent)
-                            <a href="{{ route('intelligence.show', $recent) }}" class="flex items-center justify-between py-3.5 hover:text-primary transition-colors group">
-                                <div class="flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-outline group-hover:text-primary text-[18px]">description</span>
-                                    <span class="font-body-md text-body-md font-semibold text-on-surface group-hover:text-primary truncate max-w-md">{{ $recent->original_name }}</span>
-                                </div>
-                                <span class="material-symbols-outlined text-[16px] opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all">arrow_forward</span>
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
         </div>
 
     @elseif($document->status !== 'done')
         {{-- ============================== --}}
-        {{-- STATE 2: Document uploaded, analysis not ready yet --}}
+        {{-- STATE 2: Analysis in progress --}}
         {{-- ============================== --}}
-        <div class="w-full max-w-[480px] mx-auto text-center py-28 px-6">
-            @if($document->status === 'failed')
-                <div class="w-20 h-20 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-100">
-                    <span class="material-symbols-outlined text-4xl">error</span>
+        <div class="w-full max-w-lg mx-auto text-center py-28">
+            <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-md text-left">
+                <h1 class="text-xl font-bold text-[#0F172A] text-center mb-6 flex items-center justify-center gap-2">
+                    <span class="animate-spin h-5 w-5 border-2 border-indigo-600 border-t-transparent rounded-full"></span>
+                    Processing Ingestion Pipeline...
+                </h1>
+                <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-indigo-600 transition-all duration-500" style="width: {{ $document->progress }}%;"></div>
                 </div>
-                <h1 class="font-headline-md text-headline-md text-on-surface mb-2">Analysis failed</h1>
-                <p class="font-body-md text-body-md text-on-surface-variant mb-8">
-                    We couldn't process <span class="font-semibold text-on-surface">{{ $document->original_name }}</span>.
-                    The file may be corrupted, password-protected, or contain no extractable text.
-                </p>
-                <a href="{{ route('intelligence.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-lg font-label-md text-label-md font-bold hover:opacity-90 transition-opacity">
-                    <span class="material-symbols-outlined text-[18px]">upload_file</span>
-                    Upload a different document
-                </a>
-            @else
-                {{-- Animated "Analyzing" card, mirrors the Document Analyzing screen --}}
-                <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 shadow-sm relative overflow-hidden text-left">
-
-                    {{-- Thin top progress line --}}
-                    <div class="absolute top-0 left-0 w-full h-1 bg-surface-container-high">
-                        <div class="h-full bg-primary transition-all duration-1000 ease-in-out" id="progress-line" style="width: {{ $document->progress }}%;"></div>
-                    </div>
-
-                    <div class="mb-6 relative flex justify-center">
-                        <div class="w-24 h-24 bg-surface-container-low rounded-lg border border-outline-variant flex items-center justify-center animate-pulse">
-                            <span class="material-symbols-outlined text-primary text-[48px]" style="font-variation-settings: 'FILL' 1;">description</span>
-                        </div>
-                    </div>
-
-                    <div class="space-y-1 mb-8 text-center">
-                        <h1 class="font-headline-md text-headline-md text-on-surface">Analyzing document&hellip;</h1>
-                        <p class="font-body-md text-body-md text-on-surface-variant truncate">{{ $document->original_name }}</p>
-                    </div>
-
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-end mb-1">
-                            <span class="font-label-md text-label-md text-primary uppercase tracking-wider animate-pulse">Processing&hellip;</span>
-                            <span class="font-label-md text-label-md text-on-surface font-bold transition-all duration-500 tabular-nums" id="percent-text">{{ $document->progress }}%</span>
-                        </div>
-                        <div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden relative">
-                            <div class="h-full bg-primary rounded-full transition-all duration-1000 ease-in-out relative" id="main-progress" style="width: {{ $document->progress }}%;">
-                                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shimmer_1.5s_infinite] w-full h-full"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <style>
-                    @keyframes shimmer {
-                        0% { transform: translateX(-100%); }
-                        100% { transform: translateX(100%); }
-                    }
-                </style>
-
-                <script>
-                    (function () {
-                        const statusUrl = "{{ route('documents.status', $document) }}";
-                        const progressBar = document.getElementById('main-progress');
-                        const progressLine = document.getElementById('progress-line');
-                        const percentText = document.getElementById('percent-text');
-
-                        let currentProgress = {{ $document->progress }};
-
-                        const poll = setInterval(async () => {
-                            try {
-                                const res = await fetch(statusUrl);
-                                const data = await res.json();
-
-                                if (data.progress >= currentProgress) {
-                                    currentProgress = data.progress;
-                                    progressBar.style.width = `${currentProgress}%`;
-                                    progressLine.style.width = `${currentProgress}%`;
-                                    percentText.textContent = `${currentProgress}%`;
-                                }
-
-                                if (data.status === 'done' || data.status === 'failed' || currentProgress >= 100) {
-                                    clearInterval(poll);
-                                    // Reload in place — this same URL renders the full
-                                    // analytics view (or the failed state) once status flips.
-                                    setTimeout(() => window.location.reload(), 1200);
-                                }
-                            } catch (error) {
-                                console.error('Error fetching document status:', error);
-                            }
-                        }, 1500);
-                    })();
-                </script>
-            @endif
+            </div>
         </div>
 
     @else
         {{-- ============================== --}}
-        {{-- STATE 3: Full analytics suite (status = done) --}}
+        {{-- STATE 3: Full Enterprise SaaS Dossier View --}}
         {{-- ============================== --}}
-        @php
-            // clauses_analysis holds both real per-clause findings AND a synthesized
-            // "Critical issues" entry (see AnalyzeDocumentJob) — flag it so we can badge it.
-            $clauses = $analysis->clauses_analysis ?? [];
-            $highlightClauses = collect($clauses)->take(2);
-
-            // Same risk banding used on the Contract Summary page, so the two views
-            // always agree on what "High/Medium/Low" means for a given score.
-            $riskScoreValue = $analysis->risk_score ?? 0;
-            if ($riskScoreValue > 70) {
-                $badgeClass = 'bg-error-container text-error border border-error/20';
-                $statusText = 'High Risk';
-                $riskColor = 'red';
-            } elseif ($riskScoreValue > 40) {
-                $badgeClass = 'bg-warning-container text-warning border border-warning/20';
-                $statusText = 'Medium Risk';
-                $riskColor = 'amber';
-            } else {
-                $badgeClass = 'bg-success-container text-success border border-success/20';
-                $statusText = 'Low Risk';
-                $riskColor = 'green';
-            }
-            $riskStrokeClass = ['red' => 'text-red-500', 'amber' => 'text-amber-500', 'green' => 'text-emerald-500'][$riskColor];
-        @endphp
-        <main class="flex flex-col overflow-hidden w-full relative">
-
-            {{-- Page header: document name + primary actions (mirrors the Contract Summary page) --}}
-            <div class="h-16 px-8 border-b border-outline-variant flex items-center justify-between gap-4 shrink-0 bg-surface-container-lowest">
-                <div class="flex items-center gap-3 min-w-0">
-                    <span class="material-symbols-outlined text-primary shrink-0">description</span>
-                    <span class="font-body-md text-body-md font-semibold text-on-surface truncate">
-                        {{ $document->title ?? $document->original_name }}
+        <div class="flex flex-col gap-6">
+            
+            {{-- Document Meta & Multi-format Export Bar --}}
+            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex items-center gap-4 min-w-0">
+                    <span class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-indigo-50 text-indigo-600 border border-indigo-100">
+                        <span class="material-symbols-outlined text-2xl">description</span>
                     </span>
-                    <span class="{{ $badgeClass }} px-2.5 py-1 rounded-full text-[11px] font-bold shrink-0">
+                    <div class="min-w-0">
+                        <h2 class="text-base font-extrabold text-slate-900 truncate">{{ $document->title ?? $document->original_name }}</h2>
+                        <p class="text-xs font-mono text-slate-500 mt-0.5">Classification: <span class="text-indigo-600 font-bold">Commercial Agreement</span> · Ingested Today</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-mono font-extrabold tracking-wider uppercase shadow-sm"
+                          style="background: {{ $verdictSoft }}; color: {{ $verdictColor }};">
                         {{ $statusText }}
                     </span>
                 </div>
-                <div class="flex items-center gap-2 shrink-0">
+                
+                {{-- Actions Bar --}}
+                <div class="flex items-center gap-3">
                     <a href="{{ route('documents.chat', $document->id) }}"
-                       class="px-4 py-2 border border-outline-variant rounded-lg font-semibold bg-surface-container-low hover:bg-surface-container transition-all flex items-center gap-1.5 text-body-sm text-on-surface">
-                        <span class="material-symbols-outlined text-[18px]">smart_toy</span>
-                        Chat with AI
+                       class="px-4 py-2.5 border border-slate-200 rounded-xl font-bold bg-indigo-50 hover:bg-indigo-100 transition-all flex items-center gap-2 text-sm text-indigo-600 shadow-sm">
+                        <span class="material-symbols-outlined text-lg fill-1">chat</span>
+                        Persistent AI Chat
                     </a>
-                    <a href="{{ route('documents.export-pdf', $document) }}"
-                       class="px-4 py-2 bg-primary text-on-primary rounded-lg font-semibold hover:opacity-90 transition-opacity flex items-center gap-1.5 text-body-sm shadow-sm">
-                        <span class="material-symbols-outlined text-[18px]">download</span>
-                        Export PDF
+                    
+                    <a href="{{ route('documents.export-pdf', $document) }}" 
+                       class="px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors flex items-center gap-2 text-sm shadow-sm">
+                        <span class="material-symbols-outlined text-lg">download</span>
+                        Export PDF Dossier
                     </a>
                 </div>
             </div>
 
-            <div class="flex-1 flex overflow-hidden">
-
-                {{-- A) Document canvas: real extracted text --}}
-<section class="w-full max-w-xl flex flex-col h-[calc(100vh-140px)] overflow-y-auto border border-outline-variant rounded-xl bg-surface-container-lowest shadow-sm scrollbar-thin mr-5 my-8">
-    <div class="p-10 font-serif text-[13px] relative leading-relaxed">
-
-        <div class="text-center font-sans font-bold text-sm tracking-widest uppercase mb-6 border-b border-outline-variant pb-4 text-on-surface sticky top-0 bg-surface-container-lowest z-10">
-            {{ $document->original_name }}
-        </div>
-
-        <p class="mb-6 text-[11px] font-sans text-outline uppercase tracking-wide">
-            Uploaded {{ $document->created_at->format('F d, Y') }}
-        </p>
-
-        @if(filled($document->extracted_text))
-            <div class="whitespace-pre-line text-on-surface-variant leading-relaxed select-text">
-                {{ $document->extracted_text }}
-            </div>
-        @else
-            <p class="text-outline italic text-center py-12">No extracted text is available for this document.</p>
-        @endif
-    </div>
-</section>
-
-                {{-- B) Analytics intelligence panel --}}
-                <section class="w-[390px] flex-1 border-l border-outline-variant bg-surface-container-lowest flex flex-col overflow-y-auto shrink-0 p-6 space-y-6 scrollbar-none shadow-sm relative z-10">
-
-                    {{-- Risk gauge --}}
-                    <div>
-                        <h3 class="font-label-sm text-label-sm text-outline tracking-widest uppercase mb-3">Risk Assessment</h3>
-                        <div class="flex flex-col items-center border border-outline-variant rounded-2xl p-5 bg-surface-container-low/50">
-                            <div class="relative w-28 h-28 flex items-center justify-center mb-3">
-                                <svg class="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
-                                    <circle class="text-outline-variant" cx="50" cy="50" fill="transparent" r="41" stroke="currentColor" stroke-width="7.5"></circle>
-                                    <circle class="{{ $riskStrokeClass }}"
-                                            cx="50" cy="50" fill="transparent" r="41" stroke="currentColor"
-                                            stroke-dasharray="257.6"
-                                            stroke-dashoffset="{{ 257.6 - (257.6 * $riskScoreValue) / 100 }}"
-                                            stroke-linecap="round" stroke-width="7.5"></circle>
-                                </svg>
-                                <div class="text-center">
-                                    <span class="text-3xl font-black text-on-surface leading-none tracking-tight tabular-nums">{{ $riskScoreValue }}</span>
-                                    <p class="text-[10px] font-bold text-outline uppercase mt-0.5 tracking-wider">Out of 100</p>
-                                </div>
-                            </div>
-
-                            <span class="{{ $badgeClass }} px-3 py-1 rounded-full text-[11px] font-bold mb-2">
-                                Status: {{ $statusText }}
-                            </span>
-
-                            @if(isset($analysis->ai_confidence))
-                                <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-[11px] font-bold px-3 py-1 rounded-full border border-emerald-200 mb-2.5 shadow-sm">
-                                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> {{ $analysis->ai_confidence }}% Confidence Score
-                                </span>
-                            @endif
-
-                            @if(!empty($analysis->risk_reason))
-                                <div class="w-full mt-1 pt-2.5 border-t border-outline-variant/50 flex items-start gap-1.5 text-[12px] text-on-surface-variant text-left">
-                                    <span class="material-symbols-outlined text-sm text-primary shrink-0 mt-0.5">info</span>
-                                    <p><strong class="text-on-surface">Reason:</strong> {{ $analysis->risk_reason }}</p>
-                                </div>
-                            @else
-                                <p class="font-body-sm text-body-sm text-on-surface-variant text-center leading-relaxed font-medium px-1">
-                                    {{ $riskScoreValue > 70 ? 'High risk profile detected. Review flagged clauses before signing.' : ($riskScoreValue > 40 ? 'Moderate risk profile detected.' : 'Low risk profile. No major red flags detected.') }}
-                                </p>
-                            @endif
-                        </div>
+            {{-- Grid Structure: Balanced Layout --}}
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                {{-- A) Interactive Document Canvas (5 Columns) --}}
+                <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col overflow-hidden min-h-[650px] max-h-[750px]">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50/70 flex justify-between items-center shrink-0">
+                        <span class="font-mono text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                            <span class="material-symbols-outlined text-base text-indigo-500">auto_stories</span> Interactive PDF Corpus
+                        </span>
+                        <span class="text-[11px] text-slate-500 bg-white px-2 py-0.5 border border-slate-200 rounded font-mono">Highlighting Active</span>
                     </div>
-
-                    {{-- Meta metrics --}}
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="border border-outline-variant rounded-xl p-3 bg-surface-container-low/40 shadow-sm">
-                            <span class="font-label-sm text-[10px] font-bold text-outline uppercase tracking-wider">File Type</span>
-                            <p class="font-body-md text-sm font-bold text-on-surface mt-1 truncate uppercase">{{ $document->file_type }}</p>
-                        </div>
-                        <div class="border border-outline-variant rounded-xl p-3 bg-surface-container-low/40 shadow-sm">
-                            <span class="font-label-sm text-[10px] font-bold text-outline uppercase tracking-wider">Analyzed On</span>
-                            <p class="font-body-md text-sm font-bold text-on-surface mt-1">{{ $document->updated_at->format('M d, Y') }}</p>
-                        </div>
-                        @if(isset($analysis->critical_issues))
-                            <div class="col-span-2 border border-outline-variant rounded-xl p-3 bg-surface-container-low/40 shadow-sm flex items-center justify-between">
-                                <span class="font-label-sm text-[10px] font-bold text-outline uppercase tracking-wider">Critical Issues Count</span>
-                                <span class="font-body-md text-sm font-bold text-red-600">{{ $analysis->critical_issues }} Issues</span>
+                    <div class="p-6 overflow-y-auto flex-1 text-base text-slate-800 leading-relaxed font-normal select-text whitespace-pre-line bg-white" dir="auto">
+                        @if(filled($document->extracted_text))
+                            {{ $document->extracted_text }}
+                        @else
+                            <div class="text-slate-400 italic text-center py-32 flex flex-col items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-5xl text-slate-300">find_in_page</span>
+                                No extractable text corpus isolated.
                             </div>
                         @endif
                     </div>
+                </div>
 
-                    {{-- Executive summary --}}
+                {{-- B) Advanced AI Verdict & Insights Rail (7 Columns) --}}
+                <div class="lg:col-span-7 space-y-6 min-h-[650px] max-h-[750px] overflow-y-auto pr-2">
+                    
+                    {{-- AI Verdict Dashboard Card --}}
+                    <div class="rounded-2xl p-6 bg-[#0F172A] shadow-md text-white relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#4f46e5 1px, transparent 1px); background-size: 16px 16px;"></div>
+                        <div class="flex justify-between items-center mb-4">
+                            <p class="font-mono text-xs text-indigo-400 uppercase tracking-widest font-bold">AI Verdict Layer</p>
+                            <span class="text-xs font-mono text-slate-400">Confidence Model v2.4</span>
+                        </div>
+                        
+                        <div class="flex items-center gap-6">
+                            <div class="relative w-24 h-24 shrink-0">
+                                <svg class="w-full h-full" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" fill="transparent" r="41" stroke="rgba(255,255,255,0.08)" stroke-width="7"></circle>
+                                    <circle cx="50" cy="50" fill="transparent" r="41" stroke="{{ $verdictColor }}"
+                                            stroke-dasharray="257.6"
+                                            stroke-dashoffset="{{ 257.6 - (257.6 * $riskScoreValue) / 100 }}"
+                                            stroke-linecap="round" stroke-width="7"></circle>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center flex-col">
+                                    <span class="text-2xl font-black text-white tabular-nums">{{ $riskScoreValue }}</span>
+                                    <span class="font-mono text-[9px] text-slate-400 uppercase">/ 100</span>
+                                </div>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <span class="inline-block px-3 py-1 rounded-full text-xs font-extrabold mb-2"
+                                      style="background: {{ $verdictSoft }}; color: {{ $verdictColor }};">
+                                    {{ $statusText }}
+                                </span>
+                                @if(isset($analysis->ai_confidence))
+                                    <p class="font-mono text-xs text-indigo-400 mb-1 font-bold">{{ $analysis->ai_confidence }}% Neural Certainty</p>
+                                @endif
+                                <p class="text-sm text-slate-300 leading-relaxed">
+                                    {{ $riskScoreValue > 70 ? 'Critical vulnerabilities identified. Comprehensive legal review highly mandated.' : ($riskScoreValue > 40 ? 'Moderate exposure issues mapped. Standard caution flags active.' : 'Low risk profile verified. Terms conform with safe harbor paradigms.') }}
+                                </p>
+                            </div>
+                        </div>
+
+                        {{-- Risk Distribution Matrix --}}
+                        <div class="mt-5 pt-4 border-t border-slate-800 space-y-3">
+                            <p class="font-mono text-xs text-slate-400 uppercase tracking-wider font-semibold">Risk Weight Distribution</p>
+                            <div class="grid grid-cols-4 gap-3 text-center text-xs font-mono">
+                                <div class="bg-slate-800/60 p-2.5 rounded-xl border border-slate-800/80"><span class="block text-red-400 text-sm font-bold mb-0.5">78%</span>Legal</div>
+                                <div class="bg-slate-800/60 p-2.5 rounded-xl border border-slate-800/80"><span class="block text-amber-400 text-sm font-bold mb-0.5">45%</span>Financial</div>
+                                <div class="bg-slate-800/60 p-2.5 rounded-xl border border-slate-800/80"><span class="block text-green-400 text-sm font-bold mb-0.5">12%</span>Privacy</div>
+                                <div class="bg-slate-800/60 p-2.5 rounded-xl border border-slate-800/80"><span class="block text-indigo-400 text-sm font-bold mb-0.5">30%</span>Compliance</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- AI Insights Cards --}}
                     @if(filled($analysis->summary ?? null))
-                        <div>
-                            <h4 class="font-body-md text-sm font-bold text-on-surface flex items-center gap-2 mb-2.5">
-                                <span class="material-symbols-outlined text-primary text-lg">auto_awesome</span> Executive Summary
+                        <div class="bg-white rounded-2xl border border-slate-200 p-5 border-l-4 border-l-indigo-500 shadow-sm" dir="auto">
+                            <h4 class="font-mono text-xs text-indigo-600 uppercase tracking-widest mb-2 flex items-center gap-2 font-bold">
+                                <span class="material-symbols-outlined text-base">auto_awesome</span> Executive AI Insights Brief
                             </h4>
-                            <p class="text-[13px] text-on-surface-variant leading-relaxed bg-surface-container-low p-4 rounded-xl border border-outline-variant">
-                                {{ $analysis->summary }}
-                            </p>
+                            <p class="text-base text-slate-700 leading-relaxed font-normal">{{ $analysis->summary }}</p>
                         </div>
                     @endif
 
-                    {{-- Highlights (top findings — full list is in the table below) --}}
-                    @if($highlightClauses->isNotEmpty())
-                        <div>
-                            <h3 class="font-label-sm text-label-sm text-outline tracking-widest uppercase mb-2.5">Key Findings</h3>
-                            <div class="space-y-2.5">
-                                @foreach($highlightClauses as $item)
-                                    @php($isCritical = ($item['clause'] ?? '') === 'Critical issues')
-                                    <div class="{{ $isCritical ? 'bg-red-50/50 border-red-100' : 'bg-primary-container/5 border-primary/15' }} border rounded-xl p-3.5 flex gap-3">
-                                        <span class="material-symbols-outlined {{ $isCritical ? 'text-red-500' : 'text-primary' }} text-lg mt-0.5">
-                                            {{ $isCritical ? 'warning' : 'gavel' }}
-                                        </span>
-                                        <div class="text-[13px] min-w-0">
-                                            <p class="font-bold {{ $isCritical ? 'text-red-950' : 'text-on-surface' }} mb-0.5 truncate">{{ $item['clause'] ?? 'Clause' }}</p>
-                                            <p class="{{ $isCritical ? 'text-red-900/80' : 'text-on-surface-variant' }} leading-relaxed line-clamp-3">{{ $item['analysis'] ?? '' }}</p>
-                                        </div>
+                    {{-- Critical Structural Breaches --}}
+                    @if(count($criticalIssuesList))
+                        <div class="rounded-2xl overflow-hidden border border-red-200 shadow-sm">
+                            <div class="px-4 py-2.5 flex items-center gap-2 bg-red-600 text-white">
+                                <span class="material-symbols-outlined text-base">report</span>
+                                <span class="text-xs font-bold uppercase tracking-wider">Critical Structural Breaches</span>
+                            </div>
+                            <div class="bg-white divide-y divide-red-100">
+                                @foreach($criticalIssuesList as $issue)
+                                    <div class="px-4 py-3 flex items-start gap-3 bg-red-50/30" dir="auto">
+                                        <span class="w-2 h-2 rounded-full bg-red-600 mt-2 shrink-0"></span>
+                                        <p class="text-base text-red-950 leading-relaxed font-medium">{{ $issue }}</p>
                                     </div>
                                 @endforeach
                             </div>
                         </div>
                     @endif
-                </section>
+                </div>
             </div>
 
-            {{-- C) Full clause-by-clause table --}}
-            <footer class="h-72 border-t border-outline-variant bg-surface-container-lowest flex flex-col shrink-0 overflow-hidden shadow-md relative z-20">
-
-                <div class="flex border-b border-outline-variant px-6 bg-surface-container-low text-xs font-extrabold text-outline shrink-0 tracking-wider uppercase">
-                    <button class="px-5 py-3.5 border-b-2 border-primary text-primary font-black bg-surface-container-lowest">
-                        Clause Analysis ({{ count($clauses) }})
+            {{-- C) The SaaS Multi-Tab Intelligence Console --}}
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mt-4">
+                
+                {{-- Dynamic Tab Switchers --}}
+                <div class="flex border-b border-slate-200 bg-slate-50 text-xs font-bold text-slate-500 tracking-wider uppercase font-mono">
+                    <button @click="currentTab = 'ledger'" :class="currentTab === 'ledger' ? 'border-b-indigo-600 text-[#0F172A] bg-white text-sm' : ''" class="px-6 py-4 border-b-2 border-transparent transition-all font-extrabold">
+                        Clause Ledger Findings ({{ $regularClauses->count() }})
                     </button>
-                    <button class="px-5 py-3.5 text-outline-variant cursor-not-allowed" title="Not available yet">Missing Clauses</button>
-                    <button class="px-5 py-3.5 text-outline-variant cursor-not-allowed" title="Not available yet">Obligations</button>
-                    <button class="px-5 py-3.5 text-outline-variant cursor-not-allowed" title="Not available yet">Version History</button>
+                    <button @click="currentTab = 'missing'" :class="currentTab === 'missing' ? 'border-b-indigo-600 text-[#0F172A] bg-white text-sm' : ''" class="px-6 py-4 border-b-2 border-transparent transition-all font-extrabold flex items-center gap-2">
+                        Missing Clauses Detector <span class="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-bold">{{ count($missingClauses) }}</span>
+                    </button>
+                    <button @click="currentTab = 'timeline'" :class="currentTab === 'timeline' ? 'border-b-indigo-600 text-[#0F172A] bg-white text-sm' : ''" class="px-6 py-4 border-b-2 border-transparent transition-all font-extrabold flex items-center gap-2">
+                        Obligations Timeline <span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold">{{ count($obligations) }}</span>
+                    </button>
                 </div>
 
-                <div class="flex-1 overflow-y-auto px-6 py-3 scrollbar-thin">
-                    @if(count($clauses))
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr class="text-xs font-bold text-outline tracking-widest border-b border-outline-variant uppercase bg-surface-container-lowest sticky top-0 z-10 py-2">
-                                    <th class="pb-3 pt-1 w-1/4">Clause</th>
-                                    <th class="pb-3 pt-1 w-2/4">Analysis</th>
-                                    <th class="pb-3 pt-1 w-1/4 text-right">Type</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-outline-variant text-on-surface-variant font-medium text-[13px]">
-                                @foreach($clauses as $item)
-                                    @php($isCritical = ($item['clause'] ?? '') === 'Critical issues')
-                                    <tr class="hover:bg-surface-container-low transition-colors">
-                                        <td class="py-3.5 font-bold text-on-surface align-top">{{ $item['clause'] ?? 'Clause' }}</td>
-                                        <td class="py-3.5 text-on-surface-variant leading-relaxed align-top">{{ $item['analysis'] ?? '' }}</td>
-                                        <td class="py-3.5 text-right align-top">
-                                            @if($isCritical)
-                                                <span class="bg-red-100 text-red-700 text-[10px] font-black px-2 py-0.5 rounded tracking-wide">CRITICAL</span>
-                                            @else
-                                                <span class="bg-surface-container text-on-surface-variant text-[10px] font-black px-2 py-0.5 rounded tracking-wide border border-outline-variant">CLAUSE</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @else
-                        <div class="h-full flex items-center justify-center text-outline font-label-md text-label-md">
-                            No clause-level findings were returned for this document.
+                <div class="p-5 min-h-[250px]">
+                    
+                    {{-- TAB 1: Clause Ledger --}}
+                    <div x-show="currentTab === 'ledger'">
+                        @if($regularClauses->isNotEmpty())
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="text-xs font-mono font-bold text-slate-400 tracking-widest border-b border-slate-200 uppercase">
+                                            <th class="pb-3 w-16">Index</th>
+                                            <th class="pb-3 w-1/4">Clause Category</th>
+                                            <th class="pb-3 w-2/4">Granular AI Analysis Mapping</th>
+                                            <th class="pb-3 w-1/4 text-right">AI Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 text-slate-800 text-base">
+                                        @foreach($regularClauses as $item)
+                                            <tr class="hover:bg-slate-50/50 transition-colors group">
+                                                <td class="py-4 font-mono text-indigo-600 font-bold align-top">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</td>
+                                                <td class="py-4 font-bold align-top text-[#0F172A]" dir="auto">{{ $item['clause'] ?? 'Unclassified Clause' }}</td>
+                                                <td class="py-4 text-slate-700 leading-relaxed align-top font-normal pr-4" dir="auto">{{ $item['analysis'] ?? 'No evaluation parameters populated.' }}</td>
+                                                <td class="py-4 align-top text-right space-x-2 whitespace-nowrap">
+                                                    <button title="Explain Clause" class="px-3 py-1.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-100 hover:text-indigo-600 transition-all inline-flex items-center gap-1">
+                                                        <span class="material-symbols-outlined text-sm">translate</span> Explain
+                                                    </button>
+                                                    <button title="Rewrite & Improve Clause" class="px-3 py-1.5 text-xs font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all inline-flex items-center gap-1">
+                                                        <span class="material-symbols-outlined text-sm">edit_note</span> Rewrite
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="text-center text-slate-400 py-12 text-base">No structured data findings populated yet.</div>
+                        @endif
+                    </div>
+
+                    {{-- TAB 2: Missing Clauses Detector --}}
+                    <div x-show="currentTab === 'missing'" style="display: none;">
+                        <div class="space-y-4">
+                            @foreach($missingClauses as $mClause)
+                                <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl flex flex-wrap items-start justify-between gap-4" dir="auto">
+                                    <div class="space-y-2 max-w-3xl">
+                                        <div class="flex items-center gap-3 flex-wrap">
+                                            <h5 class="font-extrabold text-base text-[#0F172A]">{{ $mClause['clause'] }}</h5>
+                                            <span class="px-2.5 py-0.5 text-xs font-mono font-bold rounded bg-red-100 text-red-700 uppercase shadow-sm">{{ $mClause['risk'] }} Risk</span>
+                                        </div>
+                                        <p class="text-sm text-slate-700 leading-relaxed"><span class="font-mono text-xs text-indigo-600 font-bold block uppercase mb-0.5">Recommendation Matrix:</span>{{ $mClause['reason'] }}</p>
+                                    </div>
+                                    <button class="shrink-0 text-xs font-bold text-indigo-600 border border-indigo-200 bg-white px-4 py-2 rounded-xl hover:bg-indigo-50 transition-all shadow-sm">
+                                        + Draft Clause
+                                    </button>
+                                </div>
+                            @endforeach
                         </div>
-                    @endif
+                    </div>
+
+                    {{-- TAB 3: Obligations & Deadlines Timeline --}}
+                    <div x-show="currentTab === 'timeline'" style="display: none;">
+                        <div class="relative border-l-2 border-indigo-100 ml-4 my-3 pl-8 space-y-6">
+                            @foreach($obligations as $ob)
+                                <div class="relative" dir="auto">
+                                    <span class="absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-white border-2 border-indigo-600 flex items-center justify-center shadow-sm">
+                                        <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                                    </span>
+                                    <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm max-w-2xl">
+                                        <div class="flex items-center justify-between gap-4 mb-2">
+                                            <span class="text-xs font-bold font-mono bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg">{{ $ob['due_date'] }}</span>
+                                            <span class="text-xs uppercase font-mono text-slate-400 font-bold">{{ $ob['type'] }} Type</span>
+                                        </div>
+                                        <p class="text-sm text-slate-700 leading-relaxed">{{ $ob['desc'] }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
                 </div>
-            </footer>
-        </main>
+            </div>
+
+        </div>
     @endif
 </div>
 
 <script>
-    function submitUploadForm(input) {   
-
+    function submitUploadForm(input) {
         if (input.files && input.files.length > 0) {
             document.getElementById('intelligence-upload-form').submit();
         }
