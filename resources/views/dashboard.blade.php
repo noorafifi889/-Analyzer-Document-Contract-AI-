@@ -270,7 +270,7 @@
                                 {{ $doc->created_at->format('M d, Y') }}
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <a href="{{ route('documents.show', $doc->id) }}"
+                                <a href="{{ route('intelligence.show', $doc->id) }}"
                                    class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-outline hover:text-primary hover:bg-primary-container/30 transition-colors">
                                     <span class="material-symbols-outlined text-[20px]">open_in_new</span>
                                 </a>
