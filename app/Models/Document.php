@@ -17,6 +17,7 @@ protected $fillable = [
     'file_type',      
     'status',
     'progress',
+    'source_quote',
     'extracted_text',
 ];
     // Document belongsTo User

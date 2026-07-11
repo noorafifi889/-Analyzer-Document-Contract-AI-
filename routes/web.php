@@ -70,3 +70,7 @@ Route::get('/intelligence/{document}', [ContractIntelligenceController::class, '
     // مسار حفظ التعديلات (طلب POST عند الضغط على Save Preferences)
     Route::post('/update', [SettingsController::class, 'update'])->name('update');
 });
+Route::middleware(['auth'])->group(function () {
+    Route::put('/settings/update', [SettingsController::class, 'update'])->name('settings.update');
+    Route::delete('/settings/delete', [SettingsController::class, 'destroy'])->name('settings.destroy');
+});
