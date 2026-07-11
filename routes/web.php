@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\AiChatController;
+use App\Http\Controllers\ContractIntelligenceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Document;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -29,7 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/documents/history', [DocumentController::class, 'history'])->name('documents.history');
 
     // 2. رواتس الانتظار والحالة الفنية (يجب أن تكون قبل الـ Resource حتى لا يعتبرها الـ Resource جزءاً من الـ ID)
-    Route::get('/documents/{document}/analyzing', [DocumentController::class, 'analyzing'])->name('documents.analyzing');
+    // Route::get('/documents/{document}/analyzing', [DocumentController::class, 'analyzing'])->name('documents.analyzing');
     Route::get('/documents/{document}/status', [DocumentController::class, 'getStatus'])->name('documents.status');
 
     // 3. الـ Resource الكامل (يتكفل  index, create, store, show, edit, update, destroy) تلقائياً بصيغة {document}
@@ -43,3 +45,12 @@ Route::post('/documents/{document}/chat/send', [AiChatController::class, 'sendMe
 
 
 Route::get('/documents/{document}/export-pdf', [DocumentController::class, 'exportPdf'])->name('documents.export-pdf');
+
+
+Route::get('/intelligence', [ContractIntelligenceController::class, 'index'])
+    ->name('intelligence.index');
+
+// مسار عرض تحليل ملف معين بعد الرفع أو الاختيار
+Route::get('/intelligence/{document}', [ContractIntelligenceController::class, 'show'])
+    ->name('intelligence.show');
+
