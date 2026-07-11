@@ -13,9 +13,25 @@
         <button class="flex items-center gap-2 p-2 text-on-surface-variant hover:text-primary transition-colors">
             <span class="material-symbols-outlined" data-icon="help">help</span>
         </button>
-        <button class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md text-label-md font-bold flex items-center gap-2 shadow-sm hover:opacity-90 active:scale-95 transition-all">
-            <span class="material-symbols-outlined" data-icon="upload">upload</span>
-            Upload Contract
-        </button>
+ <form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data" id="header-upload-form" class="inline-block">
+    @csrf
+    {{-- هاد الإدخال المخفي بيضمن إن السيرفر يرجعك لنفس صفحة الـ intelligence --}}
+    <input type="hidden" name="redirect_to" value="intelligence">
+    
+    <label class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md text-label-md font-bold flex items-center gap-2 shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer">
+        <span class="material-symbols-outlined" data-icon="upload">upload</span>
+        Upload Contract
+        <input type="file" name="document" class="hidden" onchange="submitHeaderUploadForm(this)">
+    </label>
+</form>
     </div>
 </header>
+
+<script>
+    // الدالة الخاصة برفع الملف فوراً بمجرد اختياره من الهيدر
+    function submitHeaderUploadForm(input) {
+        if (input.files && input.files.length > 0) {
+            document.getElementById('header-upload-form').submit();
+        }
+    }
+</script>
