@@ -116,7 +116,7 @@
                                 </button>
 
                             </form>
-                               <a href="{{ route('documents.show', $doc->id) }}"
+                                <a href="{{ route('intelligence.show', $doc->id) }}"
                                    class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-outline  hover:bg-primary-container/30 transition-colors">
                                     <span class="material-symbols-outlined text-[20px]">open_in_new</span>
                                 </a>
