@@ -173,13 +173,13 @@
                 <div class="font-headline-sm text-headline-sm font-bold text-primary">
                     LexiGuard AI
                 </div>
-                <nav class="hidden md:flex items-center space-x-lg font-body-md text-body-md">
+                {{-- <nav class="hidden md:flex items-center space-x-lg font-body-md text-body-md">
                     <a class="text-on-surface-variant hover:text-primary transition-colors"
                         href="{{ route('dashboard') }}">Documents</a>
                     <a class="text-on-surface-variant hover:text-primary transition-colors"
                         href="{{ route('documents.history') }}">History</a>
                     <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Templates</a>
-                </nav>
+                </nav> --}}
                 @auth
                     <div class="relative flex items-center gap-sm">
 
@@ -208,7 +208,12 @@
                                     {{ auth()->user()->name }}</p>
                                 <p class="text-[12px] text-on-surface-variant truncate">{{ auth()->user()->email }}</p>
                             </div>
-
+                            <a  href="{{ route('dashboard') }}"
+'
+                                class="flex items-center gap-sm px-md py-sm font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">user</span>
+                                Dashboard
+                            </a>
                             <a href="#"
                                 class="flex items-center gap-sm px-md py-sm font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors">
                                 <span class="material-symbols-outlined text-[18px]">settings</span>
