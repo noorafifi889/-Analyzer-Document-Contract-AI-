@@ -150,7 +150,7 @@
                                 <span></span>
                             @endif
  
-                            <a href="{{ route('documents.show', $analysis->document->id ?? $analysis->document_id) }}"
+                            <a href="{{ route('intelligence.show', $analysis->document->id ?? $analysis->document_id) }}"
                                class="text-on-surface font-label-sm text-label-sm font-semibold inline-flex items-center gap-1 hover:underline">
                                 View analysis
                                 <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
