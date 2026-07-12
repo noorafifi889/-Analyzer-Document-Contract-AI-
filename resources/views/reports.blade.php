@@ -3,13 +3,7 @@
 @section('title', 'Compliance Reports Dashboard | LexiGuard AI')
 
 @section('content')
-<style>
-    body {
-        font-family: 'Cairo', 'Amiri', sans-serif;
-        direction: rtl;
-        text-align: right;
-    }
-</style>
+
 
 @php
     $riskMeta = function (?int $score) {

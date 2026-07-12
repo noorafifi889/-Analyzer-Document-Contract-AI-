@@ -9,7 +9,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
 use Illuminate\Support\Str;
-use ArPHP\I18N\Arabic;
+use I18N\Arabic;
 class DocumentController extends Controller
 {
     public function store(Request $request)
@@ -89,30 +89,21 @@ class DocumentController extends Controller
             'progress' => $document->progress, // 0, 20, 50, 90, 100
         ]);
     }
-   public function exportPdf($id)
+ public function exportPdf($id)
 {
     $document = Document::findOrFail($id);
     $analysis = $document->analyses()->latest()->first();
-    
+
     abort_if(! $analysis, 404, 'Analysis report is not ready yet.');
 
-    // استخدام كلاس المعالجة المدمج مباشرة في حزمة dompdf للغة العربية
-$arabic = new \ArPHP\I18N\Arabic('Glyphs');
-    
-    // إذا استمر الخطأ احذفي السطور السابقة واستخدمي النصوص مباشرة، 
-    // لأن DomPDF الحديث يدعم الـ UTF-8 بمجرد وضع كود الـ CSS الصحيح بالـ View.
     $dynamicTitle = $document->title;
     $dynamicSummary = $analysis->summary;
     $dynamicCounterparty = $analysis->counterparty ?? 'N/A';
 
     $pdf = Pdf::loadView('pdf.report', compact('document', 'analysis', 'dynamicTitle', 'dynamicSummary', 'dynamicCounterparty'));
-    
+
     return $pdf->download('Report-'.$document->id.'.pdf');
 }
-    /**
-     * تصدير نفس التقرير بصيغة Word (.docx).
-     * يتطلب تثبيت الحزمة: composer require phpoffice/phpword
-     */
     public function exportWord(Document $document)
     {
         abort_unless($document->user_id === auth()->id(), 403);
