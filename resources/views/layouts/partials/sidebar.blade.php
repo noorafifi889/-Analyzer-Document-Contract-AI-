@@ -37,6 +37,12 @@
                         <span class="font-label-md text-label-md">Settings</span>
         </a>
 
+                     <a href="{{ route('reports.index') }}"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-150
+                  {{ request()->routeIs('reports.*') ? 'text-primary font-bold bg-surface-container-low' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
+            <span class="material-symbols-outlined">bar_chart</span>
+                        <span class="font-label-md text-label-md">Reports</span>
+        </a>
         <div class="pt-8 pb-4">
             <p class="px-3 font-label-sm text-label-sm text-outline uppercase tracking-widest">Admin</p>
         </div>
