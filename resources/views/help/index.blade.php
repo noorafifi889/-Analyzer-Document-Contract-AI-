@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-7xl py-8 px-4 md:px-8 mx-auto">
+<div class="max-w-7xl px-4 md:px-8 mx-auto">
 
     {{-- Hero --}}
     <div class="mb-10">
@@ -100,7 +100,7 @@
                 <p class="text-body-md text-on-surface-variant">Our support team is ready to assist you at any time.</p>
             </div>
         </div>
-        <a href="mailto:support@example.com" class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-bold text-label-md shadow-sm hover:opacity-90 active:scale-95 transition-all whitespace-nowrap">
+        <a href="mailto:noorelafifi889@gmail.com" class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-bold text-label-md shadow-sm hover:opacity-90 active:scale-95 transition-all whitespace-nowrap">
             Contact Us
         </a>
     </div>
