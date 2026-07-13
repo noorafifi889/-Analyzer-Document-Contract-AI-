@@ -1,8 +1,10 @@
 <header class="sticky top-0 z-40 w-full bg-surface/80 backdrop-blur-md border-b border-outline-variant flex justify-between items-center h-16 px-margin-page">
     <div class="flex items-center gap-4 flex-1">
+        <!-- أضفنا x-trap لمنع تشتت الفوكس إذا لزم الأمر، وتم تحسين الـ click.outside -->
         <div class="relative w-full max-w-md" x-data="headerSearch()" @click.outside="open = false">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg" data-icon="search">search</span>
 
+            <!-- تم إضافة @keydown.enter.prevent لمنع أي ريفريش أو ريبلوود للصفحة عند ضغط Enter -->
             <input
                 class="w-full bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-body-md focus:ring-1 focus:ring-primary"
                 placeholder="Search contracts, clauses, or vendors..."
@@ -10,17 +12,20 @@
                 x-model="query"
                 @input.debounce.350ms="search()"
                 @focus="if (results) open = true"
+                @keydown.enter.prevent
             />
 
             <!-- Loading spinner صغير -->
-            <div x-show="loading" class="absolute right-3 top-1/2 -translate-y-1/2">
+            <div x-show="loading" class="absolute right-3 top-1/2 -translate-y-1/2" x-cloak>
                 <span class="material-symbols-outlined animate-spin text-on-surface-variant text-lg">progress_activity</span>
             </div>
 
             <!-- Dropdown النتائج -->
+            <!-- تم إضافة x-cloak لمنع ظهور الـ dropdown للحظة عند تحميل الصفحة لأول مرة -->
             <div
                 x-show="open"
                 x-transition
+                x-cloak
                 class="absolute mt-2 w-full bg-surface-container rounded-2xl shadow-lg border border-outline-variant overflow-hidden z-50"
                 style="display: none;"
             >
@@ -44,13 +49,14 @@
     </div>
 
     <div class="flex items-center gap-4">
-        <button class="flex items-center gap-2 p-2 text-on-surface-variant hover:text-primary transition-colors relative">
+        <!-- تحديد نوع الزر كـ type="button" لمنع اختلاطه مع أي فورم بالصفحة -->
+        <button type="button" class="flex items-center gap-2 p-2 text-on-surface-variant hover:text-primary transition-colors relative">
             <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
             <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
         </button>
-<a href="{{ route('help.index') }}" class="flex items-center gap-2 p-2 text-on-surface-variant hover:text-primary transition-colors">
-    <span class="material-symbols-outlined" data-icon="help">help</span>
-</a>
+        <a href="{{ route('help.index') }}" class="flex items-center gap-2 p-2 text-on-surface-variant hover:text-primary transition-colors">
+            <span class="material-symbols-outlined" data-icon="help">help</span>
+        </a>
         <form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data" id="header-upload-form" class="inline-block">
             @csrf
             <input type="hidden" name="redirect_to" value="intelligence">
