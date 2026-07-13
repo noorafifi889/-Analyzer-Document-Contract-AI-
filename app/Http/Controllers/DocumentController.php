@@ -10,8 +10,24 @@ use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
 use Illuminate\Support\Str;
 use I18N\Arabic;
+
 class DocumentController extends Controller
 {
+    public function index(Request $request)
+    {
+        // تم الإبقاء عليها كما هي، لكن الفلترة الأساسية والصفحة المطلوبة تعمل على دالة history بالأسفل
+        $departments = Document::whereNotNull('department')->distinct()->pluck('department');
+        $query = Document::with(['analyses'])->latest();
+
+        if ($request->has('department') && $request->department != '') {
+            $query->where('department', $request->department);
+        }
+
+        $documents = $query->paginate(10)->withQueryString();
+
+        return view('documents.history', compact('documents', 'departments'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -47,14 +63,29 @@ class DocumentController extends Controller
         return redirect()->route('intelligence.show', $document);
     }
 
-    public function history()
+    public function history(Request $request)
     {
-        // نجيب علاقة analyses مع كل مستند بضربة واحدة (eager load) عشان
-        // المودال بالواجهة يقدر يعرض risk_score / summary / key_risks... من غير N+1 queries
-        $documents = auth()->user()->documents()
-            ->with(['analyses' => fn ($q) => $q->latest()])
-            ->latest()
-            ->paginate(10);
+        // 1. بناء الاستعلام الخاص بمستندات المستخدم الحالي فقط لضمان الأمان
+        $query = auth()->user()->documents()
+            ->with(['analyses' => fn ($q) => $q->latest()]);
+
+        // 2. تطبيق فلترة مستوى الخطورة (Risk Level) بناءً على الـ Request
+        if ($request->filled('risk')) {
+            $risk = $request->risk;
+            
+            $query->whereHas('analyses', function($q) use ($risk) {
+                if ($risk === 'low') {
+                    $q->where('risk_score', '<=', 35);
+                } elseif ($risk === 'med') {
+                    $q->where('risk_score', '>', 35)->where('risk_score', '<=', 65);
+                } elseif ($risk === 'high') {
+                    $q->where('risk_score', '>', 65);
+                }
+            });
+        }
+
+        // 3. جلب المستندات مرتبة من الأحدث إلى الأقدم مع الحفاظ على قيم الفلترة في الترقيم الصفحي
+        $documents = $query->latest()->paginate(10)->withQueryString();
 
         return view('documents.history', compact('documents'));
     }
@@ -89,21 +120,23 @@ class DocumentController extends Controller
             'progress' => $document->progress, // 0, 20, 50, 90, 100
         ]);
     }
- public function exportPdf($id)
-{
-    $document = Document::findOrFail($id);
-    $analysis = $document->analyses()->latest()->first();
 
-    abort_if(! $analysis, 404, 'Analysis report is not ready yet.');
+    public function exportPdf($id)
+    {
+        $document = Document::findOrFail($id);
+        $analysis = $document->analyses()->latest()->first();
 
-    $dynamicTitle = $document->title;
-    $dynamicSummary = $analysis->summary;
-    $dynamicCounterparty = $analysis->counterparty ?? 'N/A';
+        abort_if(! $analysis, 404, 'Analysis report is not ready yet.');
 
-    $pdf = Pdf::loadView('pdf.report', compact('document', 'analysis', 'dynamicTitle', 'dynamicSummary', 'dynamicCounterparty'));
+        $dynamicTitle = $document->title;
+        $dynamicSummary = $analysis->summary;
+        $dynamicCounterparty = $analysis->counterparty ?? 'N/A';
 
-    return $pdf->download('Report-'.$document->id.'.pdf');
-}
+        $pdf = Pdf::loadView('pdf.report', compact('document', 'analysis', 'dynamicTitle', 'dynamicSummary', 'dynamicCounterparty'));
+
+        return $pdf->download('Report-'.$document->id.'.pdf');
+    }
+
     public function exportWord(Document $document)
     {
         abort_unless($document->user_id === auth()->id(), 403);
