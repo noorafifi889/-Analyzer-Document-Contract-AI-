@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
@@ -64,3 +65,8 @@ Route::prefix('settings')->name('settings.')->middleware('auth')->group(function
 
 // ================= Reports =================
 Route::middleware('auth')->get('/reports', [ReportController::class, 'index'])->name('reports.index');
+
+
+
+//search 
+Route::get('/search/live', [SearchController::class, 'live'])->name('search.live');
