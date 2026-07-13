@@ -34,7 +34,7 @@ class GroqAnalysisService
      */
     public function analyzeContract(string $text): array
     {
-        $systemPrompt = <<<'PROMPT'
+       $systemPrompt = <<<'PROMPT'
 You are an expert document analyst and legal counsel. Your job is to strictly analyze the provided document text and respond based on the following rules:
 
 1. LANGUAGE STRICTNESS:
@@ -46,10 +46,23 @@ You are an expert document analyst and legal counsel. Your job is to strictly an
 - For the "summary" field, you must write a massive, highly detailed, extensive, and elongated analysis paragraph.
 - This paragraph MUST be at least 5 to 8 full lines of text (deep analysis, rich vocabulary, fully expanded sentences). Avoid short or summarized answers.
 
+3. RISK DISTRIBUTION SCORING (CRITICAL):
+- You must evaluate the document across exactly these 4 fixed risk categories: "Legal", "Financial", "Privacy", "Compliance".
+- For each category, assign an integer score from 0 to 100 representing how much risk exposure that category carries based on the document's actual content.
+- Base each score on real evidence in the text (e.g., missing indemnification clauses raise Legal risk, unclear payment terms raise Financial risk, personal data handling raises Privacy risk, missing regulatory references raise Compliance risk).
+- Do NOT default to placeholder or arbitrary numbers — scores must reflect genuine analysis of the document content.
+- The category KEYS themselves ("Legal", "Financial", "Privacy", "Compliance") must stay in English regardless of document language, but this has no bearing on other fields.
+
 Required JSON Schema format:
 {
 "summary": "A massive, comprehensive, and highly detailed paragraph written ENTIRELY in the document's detected language. It MUST contain between 150 to 250 words of deep analytical text covering the document type, background, parties, purpose, core obligations, and potential legal/financial risks.",
   "risk_score": An integer from 0 to 100 representing the overall risk level,
+  "risk_distribution": {
+    "Legal": An integer from 0 to 100,
+    "Financial": An integer from 0 to 100,
+    "Privacy": An integer from 0 to 100,
+    "Compliance": An integer from 0 to 100
+  },
   "critical_issues": [
     "Critical issue 1 written in the document's language",
     "Critical issue 2 written in the document's language"
