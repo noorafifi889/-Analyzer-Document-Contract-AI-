@@ -209,35 +209,37 @@
                 class="bg-surface-container-low p-5 rounded-2xl border border-outline-variant flex flex-col justify-between shadow-sm">
                 <span class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider block mb-3">Quick
                     Action</span>
-
-                <form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data"
-                    id="dashboard-upload-form" class="w-full">
-                    @csrf
-                    <label for="document" id="upload-label"
-                        class="w-full bg-primary text-on-primary h-11 rounded-xl font-medium flex items-center justify-center gap-2 hover:opacity-95 active:scale-[0.98] transition-all shadow-sm cursor-pointer">
-                        <span class="material-symbols-outlined text-xl">upload_file</span>
-                        <span>Upload Document</span>
-                    </label>
-
-                    <input type="file" id="document" name="document" accept=".pdf,.docx,.txt" class="hidden">
-                </form>
+<form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data" id="quick-action-upload-form" class="inline-block">
+    @csrf
+    <input type="hidden" name="redirect_to" value="intelligence">
+    <label class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md text-label-md text-center font-bold flex items-center gap-2 shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer">
+        <span class="material-symbols-outlined" data-icon="upload">upload</span>
+        Upload Contract
+        <input type="file" name="document" class="hidden" onchange="submitUploadForm(this)">
+    </label>
+</form>
             </div>
         </div>
     </div>
-
-    <script>
-        document.getElementById('risk-filter').addEventListener('change', function() {
+<script>
+document.getElementById('risk-filter').addEventListener('change', function() {
     const selectedRisk = this.value;
     const currentUrl = new URL(window.location.href);
-    
+
     if (selectedRisk) {
         currentUrl.searchParams.set('risk', selectedRisk);
     } else {
         currentUrl.searchParams.delete('risk');
     }
-    
-    currentUrl.searchParams.delete('page'); // إعادة تعيين الصفحة للأولى عند الفلترة
+
+    currentUrl.searchParams.delete('page');
     window.location.href = currentUrl.toString();
 });
-    </script>
+
+function submitUploadForm(input) {
+    if (input.files && input.files.length > 0) {
+        input.closest('form').submit();
+    }
+}
+</script>
 @endsection
