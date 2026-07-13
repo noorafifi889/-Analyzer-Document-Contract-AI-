@@ -48,9 +48,9 @@
             <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
             <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
         </button>
-        <button class="flex items-center gap-2 p-2 text-on-surface-variant hover:text-primary transition-colors">
-            <span class="material-symbols-outlined" data-icon="help">help</span>
-        </button>
+<a href="{{ route('help.index') }}" class="flex items-center gap-2 p-2 text-on-surface-variant hover:text-primary transition-colors">
+    <span class="material-symbols-outlined" data-icon="help">help</span>
+</a>
         <form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data" id="header-upload-form" class="inline-block">
             @csrf
             <input type="hidden" name="redirect_to" value="intelligence">
