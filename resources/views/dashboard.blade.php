@@ -19,12 +19,67 @@
             </p>
         </div>
  
-        <div class="flex items-center gap-3 text-on-surface-variant bg-surface-container-low px-4 py-2.5 rounded-xl border border-outline-variant w-fit shadow-sm">
-            <span class="material-symbols-outlined text-primary text-[20px]">calendar_today</span>
-            <span class="font-label-md text-label-md font-bold text-on-surface">
-                {{ now()->subDays(7)->format('M d, Y') }} &nbsp;&ndash;&nbsp; {{ now()->format('M d, Y') }}
-            </span>
-            <span class="material-symbols-outlined text-outline">expand_more</span>
+        {{-- Smooth Interactive Dropdown --}}
+        @php
+            // تحديد النص الظاهر بناءً على الـ Query String الحالي في الرابط
+            $currentRange = request('range', '7d');
+            $labels = [
+                '7d' => 'Last 7 Days',
+                '30d' => 'Last 30 Days',
+                'month' => 'This Month',
+                'all' => 'All Time'
+            ];
+            $currentLabel = $labels[$currentRange] ?? 'Last 7 Days';
+        @endphp
+
+        <div class="relative" x-data="{ open: false, selectedLabel: '{{ $currentLabel }}' }" @click.outside="open = false">
+            <button
+                @click="open = !open"
+                class="flex items-center gap-3 text-on-surface-variant bg-surface-container-low px-4 py-2.5 rounded-xl border border-outline-variant w-fit shadow-sm hover:border-primary transition-colors focus:outline-none"
+            >
+                <span class="material-symbols-outlined text-primary text-[20px]">calendar_today</span>
+                <span class="font-label-md text-label-md font-bold text-on-surface" x-text="selectedLabel"></span>
+                <span class="material-symbols-outlined text-outline transition-transform duration-200" :class="open && 'rotate-180'">expand_more</span>
+            </button>
+
+            <div
+                x-show="open"
+                x-transition:enter="transition ease-out duration-150"
+                x-transition:enter-start="opacity-0 transform scale-95 -translate-y-2"
+                x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100 transform scale-100 translate-y-0"
+                x-transition:leave-end="opacity-0 transform scale-95 -translate-y-2"
+                class="absolute right-0 mt-2 w-64 bg-surface-container rounded-2xl shadow-xl border border-outline-variant overflow-hidden z-50 origin-top-right"
+                style="display: none;"
+            >
+                <div class="py-1.5">
+                    <button @click="selectedLabel = 'Last 7 Days'; open = false; window.location.href = '{{ request()->url() }}?range=7d'"
+                            class="w-full text-start px-4 py-3 text-body-md hover:bg-surface-container-high transition-colors flex items-center justify-between {{ $currentRange === '7d' ? 'bg-primary/5 text-primary font-medium' : 'text-on-surface' }}">
+                        <span>Last 7 Days</span>
+                        <span class="text-body-sm text-on-surface-variant/80">{{ now()->subDays(7)->format('M d') }} – {{ now()->format('M d') }}</span>
+                    </button>
+
+                    <button @click="selectedLabel = 'Last 30 Days'; open = false; window.location.href = '{{ request()->url() }}?range=30d'"
+                            class="w-full text-start px-4 py-3 text-body-md hover:bg-surface-container-high transition-colors flex items-center justify-between {{ $currentRange === '30d' ? 'bg-primary/5 text-primary font-medium' : 'text-on-surface' }}">
+                        <span>Last 30 Days</span>
+                        <span class="text-body-sm text-on-surface-variant/80">{{ now()->subDays(30)->format('M d') }} – {{ now()->format('M d') }}</span>
+                    </button>
+
+                    <button @click="selectedLabel = 'This Month'; open = false; window.location.href = '{{ request()->url() }}?range=month'"
+                            class="w-full text-start px-4 py-3 text-body-md hover:bg-surface-container-high transition-colors flex items-center justify-between {{ $currentRange === 'month' ? 'bg-primary/5 text-primary font-medium' : 'text-on-surface' }}">
+                        <span>This Month</span>
+                        <span class="text-body-sm text-on-surface-variant/80">{{ now()->startOfMonth()->format('M d') }} – {{ now()->format('M d') }}</span>
+                    </button>
+
+                    <div class="border-t border-outline-variant/60 my-1"></div>
+
+                    <button @click="selectedLabel = 'All Time'; open = false; window.location.href = '{{ request()->url() }}?range=all'"
+                            class="w-full text-start px-4 py-3 text-body-md hover:bg-surface-container-high transition-colors {{ $currentRange === 'all' ? 'bg-primary/5 text-primary font-medium' : 'text-on-surface' }}">
+                        All Time
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
  
@@ -92,7 +147,7 @@
         <div class="lg:col-span-2 flex flex-col">
             <div class="flex justify-between items-center mb-4 px-1">
                 <h3 class="font-headline-sm text-headline-sm text-on-surface">Latest AI Insights</h3>
-                <a class="text-primary font-label-md text-label-md hover:underline font-semibold inline-flex items-center gap-1" href="#">
+                <a class="text-primary font-label-md text-label-md hover:underline font-semibold inline-flex items-center gap-1" href="{{ route('documents.history') }}">
                     View all insights
                     <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
                 </a>
@@ -101,8 +156,6 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
                 @forelse($latestAnalyses as $index => $analysis)
                     @php
-                        // Card color encodes the actual risk level, not a decorative rotation,
-                        // so the eye catches the highest-risk insight first.
                         $riskScore = $analysis->risk_score ?? null;
  
                         if ($riskScore >= 70) {
@@ -112,7 +165,6 @@
                         } elseif ($riskScore !== null) {
                             $currentStyle = ['bg' => 'bg-emerald-50/60', 'border' => 'border-emerald-100', 'icon_bg' => 'bg-emerald-600', 'text' => 'text-emerald-900', 'icon' => 'verified'];
                         } else {
-                            // No score yet (analysis still processing) — neutral style
                             $currentStyle = ['bg' => 'bg-surface-container-low', 'border' => 'border-outline-variant', 'icon_bg' => 'bg-on-surface-variant', 'text' => 'text-on-surface-variant', 'icon' => 'auto_awesome'];
                         }
                     @endphp
@@ -130,7 +182,6 @@
                             </p>
                         </div>
  
-                        {{-- Footer: risk badge + link to the full analysis --}}
                         <div class="flex items-center justify-between mt-5 pt-4 border-t {{ $currentStyle['border'] }}">
                             @if(isset($analysis->risk_score))
                                 @if($analysis->risk_score >= 70)
@@ -214,7 +265,7 @@
     <section class="space-y-4">
         <div class="flex justify-between items-center px-1">
             <h3 class="font-headline-sm text-headline-sm text-on-surface">Recent Documents</h3>
-            <a class="text-primary font-label-md text-label-md hover:underline font-semibold inline-flex items-center gap-1" href="#">
+            <a class="text-primary font-label-md text-label-md hover:underline font-semibold inline-flex items-center gap-1" href="{{ route('documents.history') }}">
                 View all documents
                 <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
             </a>
@@ -300,13 +351,10 @@
         document.addEventListener('DOMContentLoaded', function () {
             const ctx = document.getElementById('riskDonutChart').getContext('2d');
  
-            // Real counts injected from the server
             const highRiskData = {{ $highRiskCount }};
             const medRiskData  = {{ $medRiskCount }};
             const lowRiskData  = {{ $lowRiskCount }};
  
-            // Fall back to a neutral, fully-formed ring when there is no data yet,
-            // instead of rendering a broken/empty chart
             const hasData    = (highRiskData + medRiskData + lowRiskData) > 0;
             const chartData  = hasData ? [highRiskData, medRiskData, lowRiskData] : [0, 0, 1];
             const chartColors = hasData ? ['#EF4444', '#F59E0B', '#10B981'] : ['#E5E7EB'];
@@ -339,5 +387,5 @@
             });
         });
     </script>
-@endpush
+@endpush 
 @endsection
