@@ -92,6 +92,7 @@ class AnalyzeDocumentJob implements ShouldQueue
             ]);
 
             $analysisResult = $groqService->analyzeContract($text);
+Log::info('GROQ RAW RESULT', $analysisResult);
 
             $criticalIssuesList = $analysisResult['critical_issues'] ?? [];
             $clausesAnalysis = $analysisResult['clauses_analysis'] ?? [];
@@ -103,16 +104,20 @@ class AnalyzeDocumentJob implements ShouldQueue
                 ];
             }
 
-            Analysis::create([
-                'document_id' => $this->document->id,
-                'summary' => $analysisResult['summary'] ?? null,
-                'risk_score' => $analysisResult['risk_score'] ?? null,
-                'critical_issues' => count($criticalIssuesList), 
-                'clauses_analysis' => $clausesAnalysis,
-                'ai_confidence' => isset($analysisResult['ai_confidence'])
-                                        ? (int) round($analysisResult['ai_confidence'] * 100)
-                                        : null, 
-            ]);
+Analysis::create([
+    'document_id'        => $this->document->id,
+    'summary'            => $analysisResult['summary'] ?? null,
+    'risk_score'         => $analysisResult['risk_score'] ?? null,
+    
+    // التعديل السحري: تحويل المصفوفة يدويًا إلى نص JSON قبل الإرسال لقاعدة البيانات
+    'risk_distribution'  => isset($analysisResult['risk_distribution']) ? json_encode($analysisResult['risk_distribution']) : null, 
+    
+    'critical_issues'    => count($criticalIssuesList), 
+    'clauses_analysis'   => $clausesAnalysis,
+    'ai_confidence'      => isset($analysisResult['ai_confidence'])
+                                ? (int) round($analysisResult['ai_confidence'] * 100)
+                                : null, 
+]);
 
             $this->document->update(['progress' => 90]);
             $this->document->update(['status' => 'done', 'progress' => 100]);

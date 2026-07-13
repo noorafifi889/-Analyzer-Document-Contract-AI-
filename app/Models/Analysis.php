@@ -15,6 +15,8 @@ class Analysis extends Model
 
         'critical_issues', 
         'ai_confidence', 
+          'clauses_analysis' => 'array',
+    'risk_distribution' => 'array', 
         'clauses_analysis'
     ];
    protected $casts = [
