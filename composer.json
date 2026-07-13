@@ -7,9 +7,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "ar-php/ar-php": "^1.0",
         "barryvdh/laravel-dompdf": "^3.1",
+        "khaled.alshamaa/ar-php": "^7.0",
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0",
+        "mpdf/mpdf": "^8.3",
         "phpoffice/phpword": "^1.1",
         "spatie/pdf-to-text": "^1.55"
     },

@@ -50,15 +50,7 @@
                 <h2 class="font-headline-lg text-headline-lg text-on-surface mb-1">Intelligence Reports</h2>
                 <p class="font-body-md text-on-surface-variant max-w-2xl">Actionable legal insights derived from your entire contract ecosystem. Manage summaries and risk matrices.</p>
             </div>
-            <div class="flex items-center gap-3 self-start md:self-auto shrink-0">
-                <button class="flex items-center gap-2 px-3.5 py-1.5 bg-surface border border-outline-variant rounded-lg font-label-md text-on-surface hover:bg-surface-container-low transition-colors">
-                    <span class="material-symbols-outlined text-sm">calendar_today</span> Last 30 Days
-                </button>
-                <div class="h-6 w-[1px] bg-outline-variant"></div>
-                <button class="flex items-center gap-2 px-3.5 py-1.5 bg-white text-on-surface border border-outline-variant rounded-lg font-label-md hover:bg-surface-container-low transition-colors paper-shadow">
-                    <span class="material-symbols-outlined text-sm">csv</span> Export CSV
-                </button>
-            </div>
+         
         </div>
 
         {{-- Stats Grid --}}

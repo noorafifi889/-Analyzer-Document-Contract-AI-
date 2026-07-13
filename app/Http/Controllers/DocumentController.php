@@ -9,7 +9,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
 use Illuminate\Support\Str;
-use I18N\Arabic;
+use ArPHP\I18N\Arabic;
+use Mpdf\Mpdf;
 
 class DocumentController extends Controller
 {
@@ -121,22 +122,34 @@ class DocumentController extends Controller
         ]);
     }
 
-    public function exportPdf($id)
-    {
-        $document = Document::findOrFail($id);
-        $analysis = $document->analyses()->latest()->first();
+public function exportPdf($id)
+{
+    $document = Document::findOrFail($id);
+    $analysis = $document->analyses()->latest()->first();
 
-        abort_if(! $analysis, 404, 'Analysis report is not ready yet.');
+    abort_if(! $analysis, 404, 'Analysis report is not ready yet.');
 
-        $dynamicTitle = $document->title;
-        $dynamicSummary = $analysis->summary;
-        $dynamicCounterparty = $analysis->counterparty ?? 'N/A';
+    $html = view('documents.summary-pdf', compact('document', 'analysis'))->render();
 
-        $pdf = Pdf::loadView('pdf.report', compact('document', 'analysis', 'dynamicTitle', 'dynamicSummary', 'dynamicCounterparty'));
+    $mpdf = new Mpdf([
+        'mode' => 'utf-8',
+        'format' => 'A4',
+        'default_font' => 'dejavusans',
+        'margin_left' => 15,
+        'margin_right' => 15,
+        'margin_top' => 15,
+        'margin_bottom' => 15,
+    ]);
 
-        return $pdf->download('Report-'.$document->id.'.pdf');
-    }
+    $mpdf->autoScriptToLang = true;
+    $mpdf->autoLangToFont = true;
 
+    $mpdf->WriteHTML($html);
+
+    return response($mpdf->Output('', 'S'), 200)
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', 'attachment; filename="Report-'.$document->id.'.pdf"');
+}
     public function exportWord(Document $document)
     {
         abort_unless($document->user_id === auth()->id(), 403);
