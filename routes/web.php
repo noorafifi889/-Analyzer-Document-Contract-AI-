@@ -4,6 +4,7 @@ use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\ContractIntelligenceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\HelpController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SearchController;
@@ -70,3 +71,11 @@ Route::middleware('auth')->get('/reports', [ReportController::class, 'index'])->
 
 //search 
 Route::get('/search/live', [SearchController::class, 'live'])->name('search.live');
+
+
+//help  
+Route::middleware('auth')->group(function () {
+    Route::get('/help', [HelpController::class, 'index'])->name('help.index');
+});
+
+

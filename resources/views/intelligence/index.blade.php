@@ -75,7 +75,7 @@
                     <span class="material-symbols-outlined text-indigo-500 text-xl">history</span>
                     <h3 class="text-sm font-mono font-bold uppercase tracking-wider text-slate-500">Recent Analyzed Contracts</h3>
                 </div>
-                
+
                 @if($recentDocuments->isNotEmpty())
                     <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm divide-y divide-slate-100">
                         @foreach($recentDocuments->take(5) as $recent)
@@ -90,6 +90,8 @@
                                 <div class="flex items-center gap-2 shrink-0">
                                     @if($recent->status === 'done')
                                         <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-green-50 text-green-700 border border-green-200">Ready</span>
+                                    @elseif($recent->status === 'failed')
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-red-50 text-red-700 border border-red-200">Failed</span>
                                     @else
                                         <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-amber-50 text-amber-600 border border-amber-200 animate-pulse">Processing</span>
                                     @endif
@@ -106,6 +108,50 @@
             </div>
         </div>
 
+    @elseif($document->status === 'failed')
+        {{-- ============================== --}}
+        {{-- STATE 2b: Analysis failed      --}}
+        {{-- ============================== --}}
+        <div class="w-full max-w-xl mx-auto py-24 px-4">
+            <div class="bg-white border border-red-200 rounded-2xl p-8 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 inset-x-0 h-1.5 bg-red-600"></div>
+
+                <div class="flex flex-col items-center text-center">
+                    <div class="w-20 h-20 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mb-6 border border-red-100">
+                        <span class="material-symbols-outlined text-4xl">error</span>
+                    </div>
+
+                    <h1 class="text-2xl font-black text-slate-900 mb-2 tracking-tight">Analysis Failed</h1>
+                    <p class="text-sm text-slate-500 max-w-xs mb-8">
+                        حصل خطأ أثناء معالجة هالعقد. ممكن يكون الملف تالف أو صيغته غير مدعومة.
+                    </p>
+
+                    <div class="w-full bg-slate-50 rounded-xl p-4 border border-slate-100 text-left mb-6 flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0 border border-red-100">
+                            <span class="material-symbols-outlined text-xl">description</span>
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-mono text-slate-400 uppercase font-bold tracking-wider">Target Resource</p>
+                            <p class="text-sm font-bold text-slate-800 truncate">{{ $document->original_name }}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 w-full">
+                        <form action="{{ route('documents.destroy', $document) }}" method="POST" class="flex-1">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all text-sm">
+                                حذف الملف
+                            </button>
+                        </form>
+                        <a href="{{ route('documents.index') }}" class="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors text-sm text-center">
+                            ارفع ملف جديد
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     @elseif($document->status !== 'done')
         {{-- ============================== --}}
         {{-- STATE 2: Analysis in progress  --}}
@@ -114,7 +160,7 @@
             <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-xl relative overflow-hidden">
                 {{-- Decorative Top Glow Banner --}}
                 <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
-                
+
                 <div class="flex flex-col items-center text-center">
                     {{-- Animated Progress Ring/Spinner Wrapper --}}
                     <div class="relative w-20 h-20 flex items-center justify-center mb-6">
@@ -125,9 +171,9 @@
 
                     <h1 class="text-2xl font-black text-slate-900 mb-2 tracking-tight">Processing Ingestion Pipeline</h1>
                     <p class="text-sm text-slate-500 max-w-xs mb-8">AI is parsing the contract corpus, structure mapping, and verifying global compliance parameters...</p>
-                    
+
                     {{-- Current File Status Block --}}
-                    <div class="w-full bg-slate-50 rounded-xl p-4 border border-slate-100 text-left mb-6 flex items-center gap-3">
+                    <div class="w-full bg-slate-50 rounded-xl p-4 border border-slate-100 text-left mb-6 flex items-center gap-3" id="statusBlock">
                         <span class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100">
                             <span class="material-symbols-outlined text-xl">quick_reference_all</span>
                         </span>
@@ -135,13 +181,14 @@
                             <p class="text-xs font-mono text-slate-400 uppercase font-bold tracking-wider">Target Resource</p>
                             <p class="text-sm font-bold text-slate-800 truncate">{{ $document->original_name }}</p>
                         </div>
-                        <span class="font-mono text-sm font-black text-indigo-600 bg-white px-2.5 py-1 rounded-md border border-slate-200 shadow-sm">{{ $document->progress ?? 0 }}%</span>
+                        <span class="font-mono text-sm font-black text-indigo-600 bg-white px-2.5 py-1 rounded-md border border-slate-200 shadow-sm" id="progressPercentText">{{ $document->progress ?? 0 }}%</span>
                     </div>
 
                     {{-- Main Progress Bar Track --}}
                     <div class="w-full">
                         <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                            <div class="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 transition-all duration-500 rounded-full shadow-sm" 
+                            <div class="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 transition-all duration-500 rounded-full shadow-sm"
+                                 id="progressBarFill"
                                  style="width: {{ $document->progress ?? 0 }}%;"></div>
                         </div>
                         <div class="flex justify-between items-center mt-3 text-xs font-mono font-bold text-slate-400 uppercase tracking-wide">
@@ -158,7 +205,7 @@
         {{-- STATE 3: Full Enterprise SaaS Dossier View --}}
         {{-- ============================== --}}
         <div class="flex flex-col gap-6">
-            
+
             {{-- Document Meta & Multi-format Export Bar --}}
             <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                 <div class="flex items-center gap-4 min-w-0">
@@ -174,7 +221,7 @@
                         {{ $statusText }}
                     </span>
                 </div>
-                
+
                 {{-- Actions Bar --}}
                 <div class="flex items-center gap-3">
                     <a href="{{ route('documents.chat', $document->id) }}"
@@ -182,8 +229,8 @@
                         <span class="material-symbols-outlined text-lg fill-1">chat</span>
                         Persistent AI Chat
                     </a>
-                    
-                    <a href="{{ route('documents.export-pdf', $document) }}" 
+
+                    <a href="{{ route('documents.export-pdf', $document) }}"
                        class="px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors flex items-center gap-2 text-sm shadow-sm">
                         <span class="material-symbols-outlined text-lg">download</span>
                         Export PDF Dossier
@@ -193,7 +240,7 @@
 
             {{-- Grid Structure: Balanced Layout --}}
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                
+
                 {{-- A) Interactive Document Canvas (5 Columns) --}}
                 <div class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col overflow-hidden min-h-[650px] max-h-[750px]">
                     <div class="p-4 border-b border-slate-100 bg-slate-50/70 flex justify-between items-center shrink-0">
@@ -216,7 +263,7 @@
 
                 {{-- B) Advanced AI Verdict & Insights Rail (7 Columns) --}}
                 <div class="lg:col-span-7 space-y-6 min-h-[650px] max-h-[750px] overflow-y-auto pr-2">
-                    
+
                     {{-- AI Verdict Dashboard Card --}}
                     <div class="rounded-2xl p-6 bg-[#0F172A] shadow-md text-white relative overflow-hidden">
                         <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#4f46e5 1px, transparent 1px); background-size: 16px 16px;"></div>
@@ -224,7 +271,7 @@
                             <p class="font-mono text-xs text-indigo-400 uppercase tracking-widest font-bold">AI Verdict Layer</p>
                             <span class="text-xs font-mono text-slate-400">Confidence Model v2.4</span>
                         </div>
-                        
+
                         <div class="flex items-center gap-6">
                             <div class="relative w-24 h-24 shrink-0">
                                 <svg class="w-full h-full" viewBox="0 0 100 100">
@@ -297,7 +344,7 @@
 
             {{-- C) The SaaS Multi-Tab Intelligence Console --}}
             <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mt-4">
-                
+
                 {{-- Dynamic Tab Switchers --}}
                 <div class="flex border-b border-slate-200 bg-slate-50 text-xs font-bold text-slate-500 tracking-wider uppercase font-mono">
                     <button @click="currentTab = 'ledger'" :class="currentTab === 'ledger' ? 'border-b-indigo-600 text-[#0F172A] bg-white text-sm' : ''" class="px-6 py-4 border-b-2 border-transparent transition-all font-extrabold">
@@ -312,7 +359,7 @@
                 </div>
 
                 <div class="p-5 min-h-[250px]">
-                    
+
                     {{-- TAB 1: Clause Ledger --}}
                     <div x-show="currentTab === 'ledger'">
                         @if($regularClauses->isNotEmpty())
@@ -404,4 +451,39 @@
         }
     }
 </script>
+
+@if($document && !in_array($document->status, ['done', 'failed']))
+<script>
+    (function () {
+        const statusUrl = "{{ route('documents.status', $document->id) }}";
+        const progressBarFill = document.getElementById('progressBarFill');
+        const progressPercentText = document.getElementById('progressPercentText');
+
+        const pollInterval = setInterval(async () => {
+            try {
+                const res = await fetch(statusUrl, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+
+                // تحديث شريط التقدم مباشرة بدون Refresh
+                if (progressBarFill) {
+                    progressBarFill.style.width = data.progress + '%';
+                }
+                if (progressPercentText) {
+                    progressPercentText.textContent = data.progress + '%';
+                }
+
+                // لما يخلص التحليل أو يفشل، حوّله تلقائياً
+                if (data.status === 'done' || data.status === 'failed') {
+                    clearInterval(pollInterval);
+                    window.location.reload();
+                }
+            } catch (e) {
+                console.error('Status polling error:', e);
+            }
+        }, 3000); // كل 3 ثواني
+    })();
+</script>
+@endif
 @endsection
