@@ -72,9 +72,7 @@
     <div class="w-full antialiased text-[#0F172A] -mt-4 font-sans selection:bg-indigo-100" x-data="{ currentTab: 'ledger' }">
 
         @if (!$document)
-            {{-- ============================== --}}
-            {{-- STATE 1: No document selected --}}
-            {{-- ============================== --}}
+    
             <div class="w-full max-w-3xl mx-auto text-center mt-10">
 
                 <div class="flex items-center justify-center gap-4 mb-4">
