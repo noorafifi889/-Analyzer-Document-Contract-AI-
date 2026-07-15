@@ -1,9 +1,7 @@
 <aside 
     x-data 
-    x-cloak
     :class="$store.sidebar.open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
     class="fixed left-0 top-0 h-screen w-[280px] bg-surface-container-lowest border-r border-outline-variant flex flex-col py-stack-lg px-gutter z-50 transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0">
-    <!-- زر إغلاق الـ Sidebar (يظهر فقط على الشاشات الصغيرة لتسهيل الاستخدام) -->
     <div class="flex justify-end lg:hidden mb-2">
         <button type="button" @click="$store.sidebar.open = false" class="p-1 text-on-surface-variant hover:text-primary">
             <span class="material-symbols-outlined">close</span>
