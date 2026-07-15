@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Analysis;
 use App\Models\Document;
+use App\Notifications\ReportReadyNotification;
 use App\Services\GroqAnalysisService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,6 +17,7 @@ use PhpOffice\PhpWord\Element\Table;
 use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\IOFactory;
 use Spatie\PdfToText\Pdf;
+use Throwable;
 
 class AnalyzeDocumentJob implements ShouldQueue
 {
@@ -27,8 +29,8 @@ class AnalyzeDocumentJob implements ShouldQueue
     {
         Log::info('JOB STARTED', [
             'document_id' => $this->document->id,
-            'file_path' => $this->document->file_path,
-            'file_type' => $this->document->file_type,
+            'file_path'   => $this->document->file_path,
+            'file_type'   => $this->document->file_type,
         ]);
 
         $this->document->update(['status' => 'processing', 'progress' => 20]);
@@ -38,7 +40,7 @@ class AnalyzeDocumentJob implements ShouldQueue
 
         try {
             if (! file_exists($filePath)) {
-                throw new \Exception('الملف غير موجود في المسار: '.$filePath);
+                throw new \Exception('File not found at path: ' . $filePath);
             }
 
             if ($this->document->file_type === 'pdf') {
@@ -50,7 +52,7 @@ class AnalyzeDocumentJob implements ShouldQueue
                     foreach ($phpWord->getSections() as $section) {
                         foreach ($section->getElements() as $element) {
                             if (method_exists($element, 'getText')) {
-                                $text .= $element->getText()."\n";
+                                $text .= $element->getText() . "\n";
                             } elseif ($element instanceof TextRun) {
                                 foreach ($element->getElements() as $textElement) {
                                     if (method_exists($textElement, 'getText')) {
@@ -63,7 +65,7 @@ class AnalyzeDocumentJob implements ShouldQueue
                                     foreach ($row->getCells() as $cell) {
                                         foreach ($cell->getElements() as $cellElement) {
                                             if (method_exists($cellElement, 'getText')) {
-                                                $text .= $cellElement->getText().' ';
+                                                $text .= $cellElement->getText() . ' ';
                                             }
                                         }
                                     }
@@ -72,62 +74,63 @@ class AnalyzeDocumentJob implements ShouldQueue
                             }
                         }
                     }
-                } catch (\Throwable $e) {
-                    Log::warning('فشلت قراءة PhpWord القياسية، يتم الانتقال لطريقة الاستخراج السريع للملف: '.$this->document->id);
+                } catch (Throwable $e) {
+                    Log::warning('Standard PhpWord reading failed, falling back to direct extraction for document ID: ' . $this->document->id);
                     $text = $this->extractTextFromDocxDirectly($filePath);
                 }
             }
 
-            // === 🌟 خطوة التنظيف الجديدة 🌟 ===
             $text = $this->cleanExtractedText($text);
 
             if (empty(trim($text))) {
-                throw new \Exception('المكتبة لم تعثر على أي نصوص رقمية داخل الملف بعد التنظيف.');
+                throw new \Exception('No digital text was found in the document after cleaning.');
             }
 
-            // حفظ النص النظيف في قاعدة البيانات
             $this->document->update([
                 'extracted_text' => $text,
-                'progress' => 50,
+                'progress'       => 50,
             ]);
 
             $analysisResult = $groqService->analyzeContract($text);
-Log::info('GROQ RAW RESULT', $analysisResult);
+            Log::info('GROQ RAW RESULT', $analysisResult);
 
             $criticalIssuesList = $analysisResult['critical_issues'] ?? [];
-            $clausesAnalysis = $analysisResult['clauses_analysis'] ?? [];
+            $clausesAnalysis    = $analysisResult['clauses_analysis'] ?? [];
 
             if (! empty($criticalIssuesList)) {
                 $clausesAnalysis[] = [
-                    'clause' => 'Critical issues',
+                    'clause'   => 'Critical issues',
                     'analysis' => implode(' | ', $criticalIssuesList),
                 ];
             }
 
-Analysis::create([
-    'document_id'        => $this->document->id,
-    'summary'            => $analysisResult['summary'] ?? null,
-    'risk_score'         => $analysisResult['risk_score'] ?? null,
-    
-    // التعديل السحري: تحويل المصفوفة يدويًا إلى نص JSON قبل الإرسال لقاعدة البيانات
-    'risk_distribution'  => isset($analysisResult['risk_distribution']) ? json_encode($analysisResult['risk_distribution']) : null, 
-    
-    'critical_issues'    => count($criticalIssuesList), 
-    'clauses_analysis'   => $clausesAnalysis,
-    'ai_confidence'      => isset($analysisResult['ai_confidence'])
-                                ? (int) round($analysisResult['ai_confidence'] * 100)
-                                : null, 
-]);
+            $report = Analysis::create([
+                'document_id'       => $this->document->id,
+                'summary'           => $analysisResult['summary'] ?? null,
+                'risk_score'        => $analysisResult['risk_score'] ?? null,
+                'risk_distribution' => isset($analysisResult['risk_distribution']) ? json_encode($analysisResult['risk_distribution']) : null,
+                'critical_issues'   => count($criticalIssuesList),
+                'clauses_analysis'  => $clausesAnalysis,
+                'ai_confidence'     => isset($analysisResult['ai_confidence'])
+                                        ? (int) round($analysisResult['ai_confidence'] * 100)
+                                        : null,
+            ]);
 
             $this->document->update(['progress' => 90]);
             $this->document->update(['status' => 'done', 'progress' => 100]);
 
-        } catch (\Exception $e) {
+            $owner = $this->document->user; 
+            
+            if ($owner) {
+                $owner->notify(new ReportReadyNotification($report));
+            }
+
+        } catch (Throwable $e) { // Changed to Throwable to catch fatal errors too
             $this->document->update([
-                'status' => 'failed',
+                'status'   => 'failed',
                 'progress' => 0,
             ]);
-            Log::error("Error analyzing document ID {$this->document->id}: ".$e->getMessage());
+            Log::error("Error analyzing document ID {$this->document->id}: " . $e->getMessage());
         }
     }
 
@@ -150,33 +153,24 @@ Analysis::create([
         return trim($stripedText);
     }
 
-    /**
-     * 🌟 دالة تنظيف وتنسيق النص المستخرج لإزالة العشوائية والسطور الفارغة
-     */
     private function cleanExtractedText(string $text): string
     {
         if (empty($text)) return '';
 
-        // 1. تقسيم النص إلى أسطر منفصلة بناءً على النزول لسطر جديد
         $lines = explode("\n", $text);
         $cleanedLines = [];
 
         foreach ($lines as $line) {
-            // 2. تنظيف الفراغات من بداية ونهاية كل سطر
             $trimmedLine = trim($line);
 
-            // 3. تجاهل الأسطر الفارغة تماماً، أو الأسطر التي تحتوي فقط على رموز طايرة (مثل نقطة وحيدة أو شرطة وحيدة ناتجة عن التنسيق السيء)
             if ($trimmedLine === '' || $trimmedLine === '•' || $trimmedLine === '-' || $trimmedLine === '*') {
                 continue;
             }
 
-            // 4. تنظيف الفراغات المتكررة داخل السطر الواحد (تحويل الفراغات الكثيرة إلى فراغ واحد)
             $trimmedLine = preg_replace('/\s+/', ' ', $trimmedLine);
-
             $cleanedLines[] = $trimmedLine;
         }
 
-        // 5. إعادة تجميع الأسطر النظيفة بنزول سطر واحد فقط بين كل فقرة والثانية
         return implode("\n", $cleanedLines);
     }
 }
