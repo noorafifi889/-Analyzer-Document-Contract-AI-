@@ -1,15 +1,26 @@
-<aside class="fixed left-0 top-0 h-screen w-[280px] bg-surface-container-lowest border-r border-outline-variant flex flex-col py-stack-lg px-gutter z-50">
-    <div class="mb-10 px-2 flex items-center gap-3">
-        <div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center">
+<aside 
+    x-data 
+    x-cloak
+    :class="$store.sidebar.open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+    class="fixed left-0 top-0 h-screen w-[280px] bg-surface-container-lowest border-r border-outline-variant flex flex-col py-stack-lg px-gutter z-50 transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0">
+    <!-- زر إغلاق الـ Sidebar (يظهر فقط على الشاشات الصغيرة لتسهيل الاستخدام) -->
+    <div class="flex justify-end lg:hidden mb-2">
+        <button type="button" @click="$store.sidebar.open = false" class="p-1 text-on-surface-variant hover:text-primary">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+
+    <div class="mb-8 px-2 flex items-center gap-3">
+        <div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center shrink-0">
             <span class="material-symbols-outlined text-on-primary text-2xl" style="font-variation-settings: 'FILL' 1;">gavel</span>
         </div>
-        <div>
-            <h1 class="font-headline-md text-headline-md font-bold text-on-surface">LexiGuard AI</h1>
-            <p class="font-label-md text-label-md text-on-surface-variant">Enterprise Legal</p>
+        <div class="overflow-hidden">
+            <h1 class="font-headline-md text-headline-md font-bold text-on-surface truncate">LexiGuard AI</h1>
+            <p class="font-label-md text-label-md text-on-surface-variant truncate">Enterprise Legal</p>
         </div>
     </div>
 
-    <nav class="flex-1 space-y-1">
+    <nav class="flex-1 space-y-1 overflow-y-auto">
         <a href="{{ route('dashboard') }}"
            class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-150
                   {{ request()->routeIs('dashboard') ? 'text-primary font-bold bg-surface-container-low' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
@@ -30,43 +41,52 @@
             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {{ request()->routeIs('intelligence.*') ? 1 : 0 }};">psychology</span>
             <span class="font-label-md text-label-md">Contract Intelligence</span>
         </a>
-                           <a href="{{ route('reports.index') }}"
+        
+        <a href="{{ route('reports.index') }}"
            class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-150
                   {{ request()->routeIs('reports.*') ? 'text-primary font-bold bg-surface-container-low' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
             <span class="material-symbols-outlined">bar_chart</span>
-                        <span class="font-label-md text-label-md">Reports</span>
+            <span class="font-label-md text-label-md">Reports</span>
         </a>
-               <a href="{{ route('settings.index') }}"
+        
+        <a href="{{ route('settings.index') }}"
            class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-150
                   {{ request()->routeIs('settings.*') ? 'text-primary font-bold bg-surface-container-low' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
             <span class="material-symbols-outlined">settings</span>
-                        <span class="font-label-md text-label-md">Settings</span>
+            <span class="font-label-md text-label-md">Settings</span>
         </a>
-
-  
-    
     </nav>
 
-   <div class="mt-auto border-t border-outline-variant pt-6 flex items-center gap-3">
-    @if(auth()->user()->avatar)
-        <img class="w-10 h-10 rounded-full border border-outline-variant object-cover"
-             src="{{ Storage::url(auth()->user()->avatar) }}"
-             alt="{{ auth()->user()->name }}">
-    @else
-        <div class="w-10 h-10 rounded-full border border-outline-variant bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
-            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-        </div>
-    @endif
+    <div class="mt-auto border-t border-outline-variant pt-6 flex items-center gap-3">
+        @if(auth()->user()->avatar)
+            <img class="w-10 h-10 rounded-full border border-outline-variant object-cover shrink-0"
+                 src="{{ Storage::url(auth()->user()->avatar) }}"
+                 alt="{{ auth()->user()->name }}">
+        @else
+            <div class="w-10 h-10 rounded-full border border-outline-variant bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
+                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+            </div>
+        @endif
 
-    <div class="flex-1 overflow-hidden">
-        <p class="font-label-md text-label-md font-bold text-on-surface truncate">{{ auth()->user()->name }}</p>
-        <p class="font-label-sm text-label-sm text-on-surface-variant truncate">Principal Counsel</p>
+        <div class="flex-1 overflow-hidden">
+            <p class="font-label-md text-label-md font-bold text-on-surface truncate">{{ auth()->user()->name }}</p>
+            <p class="font-label-sm text-label-sm text-on-surface-variant truncate">Principal Counsel</p>
+        </div>
+        <form method="POST" action="{{ route('logout') }}" class="shrink-0">
+            @csrf
+            <button type="submit" class="text-on-surface-variant hover:text-primary transition-colors flex items-center" title="Sign out">
+                <span class="material-symbols-outlined">logout</span>
+            </button>
+        </form>
     </div>
-    <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <button type="submit" class="text-on-surface-variant hover:text-primary transition-colors" title="Sign out">
-            <span class="material-symbols-outlined">logout</span>
-        </button>
-    </form>
-</div>
 </aside>
+
+<!-- خلفية مظلمة (Backdrop) تظهر عند فتح الـ Sidebar على الموبايل لإغلاقه بسهولة بالنقر في أي مكان -->
+<div 
+    x-data 
+    x-show="$store.sidebar.open" 
+    @click="$store.sidebar.open = false" 
+    x-transition.opacity
+    class="fixed inset-0 bg-black/40 z-40 lg:hidden"
+    x-cloak>
+</div>
