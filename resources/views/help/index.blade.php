@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-7xl px-4 md:px-8 mx-auto">
+<div class="max-w-7xl px-4 md:px-8 ">
 
     {{-- Hero --}}
     <div class="mb-10">
