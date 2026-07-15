@@ -41,10 +41,15 @@
                     </div>
                     <h3 class="text-xl font-semibold text-on-surface mb-1">No history found</h3>
                     <p class="text-sm text-on-surface-variant mb-6">You haven't uploaded any documents for analysis yet.</p>
-                    <a href="{{ route('documents.create') }}"
-                        class="inline-flex items-center justify-center h-11 px-6 bg-primary text-on-primary rounded-xl font-medium hover:opacity-90 active:scale-[0.98] transition-all shadow-sm">
-                        Analyze New Document
-                    </a>
+               <form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data" id="quick-action-upload-form" class="inline-block">
+    @csrf
+    <input type="hidden" name="redirect_to" value="intelligence">
+    <label class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md text-label-md text-center font-bold flex items-center gap-2 shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer">
+        <span class="material-symbols-outlined" data-icon="upload">upload </span>
+Upload Your first Document
+        <input type="file" name="document" class="hidden" onchange="submitUploadForm(this)">
+    </label>
+</form>
                 </div>
             @else
                 <div
