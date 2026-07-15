@@ -15,19 +15,24 @@ use Mpdf\Mpdf;
 class DocumentController extends Controller
 {
     public function index(Request $request)
-    {
-        // تم الإبقاء عليها كما هي، لكن الفلترة الأساسية والصفحة المطلوبة تعمل على دالة history بالأسفل
-        $departments = Document::whereNotNull('department')->distinct()->pluck('department');
-        $query = Document::with(['analyses'])->latest();
+{
+    // جلب الأقسام الخاصة بالمستخدم الحالي فقط
+    $departments = auth()->user()->documents()->whereNotNull('department')->distinct()->pluck('department');
+    
+    // جلب مستندات المستخدم الحالي فقط (إصلاح الثغرة)
+    $query = auth()->user()->documents()->with(['analyses'])->latest();
 
-        if ($request->has('department') && $request->department != '') {
-            $query->where('department', $request->department);
-        }
-
-        $documents = $query->paginate(10)->withQueryString();
-
-        return view('documents.history', compact('documents', 'departments'));
+    if ($request->has('department') && $request->department != '') {
+        $query->where('department', $request->department);
     }
+
+    $documents = $query->paginate(10)->withQueryString();
+
+    // إذا كانت هذه الصفحة أيضاً تستخدم $recentDocuments، نضيفه هنا:
+    $recentDocuments = auth()->user()->documents()->latest()->take(5)->get();
+
+    return view('documents.history', compact('documents', 'departments', 'recentDocuments'));
+}
 
     public function store(Request $request)
     {
@@ -64,32 +69,35 @@ class DocumentController extends Controller
         return redirect()->route('intelligence.show', $document);
     }
 
-    public function history(Request $request)
-    {
-        // 1. بناء الاستعلام الخاص بمستندات المستخدم الحالي فقط لضمان الأمان
-        $query = auth()->user()->documents()
-            ->with(['analyses' => fn ($q) => $q->latest()]);
+  public function history(Request $request)
+{
+    $query = auth()->user()->documents()
+        ->with(['analyses' => fn ($q) => $q->latest()]);
 
-        // 2. تطبيق فلترة مستوى الخطورة (Risk Level) بناءً على الـ Request
-        if ($request->filled('risk')) {
-            $risk = $request->risk;
-            
-            $query->whereHas('analyses', function($q) use ($risk) {
-                if ($risk === 'low') {
-                    $q->where('risk_score', '<=', 35);
-                } elseif ($risk === 'med') {
-                    $q->where('risk_score', '>', 35)->where('risk_score', '<=', 65);
-                } elseif ($risk === 'high') {
-                    $q->where('risk_score', '>', 65);
-                }
-            });
-        }
-
-        // 3. جلب المستندات مرتبة من الأحدث إلى الأقدم مع الحفاظ على قيم الفلترة في الترقيم الصفحي
-        $documents = $query->latest()->paginate(10)->withQueryString();
-
-        return view('documents.history', compact('documents'));
+    // 2. تطبيق فلترة مستوى الخطورة (Risk Level) بناءً على الـ Request
+    if ($request->filled('risk')) {
+        $risk = $request->risk;
+        
+        $query->whereHas('analyses', function($q) use ($risk) {
+            if ($risk === 'low') {
+                $q->where('risk_score', '<=', 35);
+            } elseif ($risk === 'med') {
+                $q->where('risk_score', '>', 35)->where('risk_score', '<=', 65);
+            } elseif ($risk === 'high') {
+                $q->where('risk_score', '>', 65);
+            }
+        });
     }
+
+    // 3. جلب المستندات للجدول الأساسي
+    $documents = $query->latest()->paginate(10)->withQueryString();
+
+    // 🌟 التعديل هنا: جلب آخر 5 مستندات للمستخدم الحالي فقط من أجل القائمة الجانبية أو العلوية
+    $recentDocuments = auth()->user()->documents()->latest()->take(5)->get();
+
+    // تمرير المتغير الجديد للواجهة
+    return view('documents.history', compact('documents', 'recentDocuments'));
+}
 
     public function show(Document $document)
     {
