@@ -17,11 +17,11 @@ class GroqAnalysisService
     public function __construct()
     {
         $this->apiKey = config('services.groq.key')
-            ?? throw new Exception('Groq API key is not configured. تأكد من GROQ_API_KEY بملف .env');
+            ?? throw new Exception('Groq API key is not configured. Check GROQ_API_KEY in .env file');
 
         $this->apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
 
-        // نموذج قوي وسريع من Groq، يدعم JSON mode
+        // Fast and versatile model from Groq, supports JSON mode
         $this->model = 'llama-3.3-70b-versatile';
     }
 
@@ -37,10 +37,9 @@ class GroqAnalysisService
        $systemPrompt = <<<'PROMPT'
 You are an expert document analyst and legal counsel. Your job is to strictly analyze the provided document text and respond based on the following rules:
 
-1. LANGUAGE STRICTNESS:
-- Detect the primary language of the input document (e.g., Arabic, English).
-- You MUST write EVERY SINGLE TEXT VALUE in the JSON response using that EXACT detected language. 
-- If the document is in Arabic, all responses must be in professional Arabic. If in English, all responses must be in professional English.
+1. LANGUAGE STRICTNESS (CRITICAL):
+- You MUST provide your entire analysis, summaries, and all text values in the JSON response EXCLUSIVELY in professional English.
+- Even if the input document is written in Arabic, Spanish, or any other language, your output must ALWAYS be in English.
 
 2. LENGTH & DEPTH CRITERIA (CRITICAL):
 - For the "summary" field, you must write a massive, highly detailed, extensive, and elongated analysis paragraph.
@@ -49,13 +48,12 @@ You are an expert document analyst and legal counsel. Your job is to strictly an
 3. RISK DISTRIBUTION SCORING (CRITICAL):
 - You must evaluate the document across exactly these 4 fixed risk categories: "Legal", "Financial", "Privacy", "Compliance".
 - For each category, assign an integer score from 0 to 100 representing how much risk exposure that category carries based on the document's actual content.
-- Base each score on real evidence in the text (e.g., missing indemnification clauses raise Legal risk, unclear payment terms raise Financial risk, personal data handling raises Privacy risk, missing regulatory references raise Compliance risk).
+- Base each score on real evidence in the text.
 - Do NOT default to placeholder or arbitrary numbers — scores must reflect genuine analysis of the document content.
-- The category KEYS themselves ("Legal", "Financial", "Privacy", "Compliance") must stay in English regardless of document language, but this has no bearing on other fields.
 
 Required JSON Schema format:
 {
-"summary": "A massive, comprehensive, and highly detailed paragraph written ENTIRELY in the document's detected language. It MUST contain between 150 to 250 words of deep analytical text covering the document type, background, parties, purpose, core obligations, and potential legal/financial risks.",
+  "summary": "A massive, comprehensive, and highly detailed paragraph written ENTIRELY in English. It MUST contain between 150 to 250 words of deep analytical text covering the document type, background, parties, purpose, core obligations, and potential legal/financial risks.",
   "risk_score": An integer from 0 to 100 representing the overall risk level,
   "risk_distribution": {
     "Legal": An integer from 0 to 100,
@@ -64,13 +62,13 @@ Required JSON Schema format:
     "Compliance": An integer from 0 to 100
   },
   "critical_issues": [
-    "Critical issue 1 written in the document's language",
-    "Critical issue 2 written in the document's language"
+    "Critical issue 1 written in English",
+    "Critical issue 2 written in English"
   ],
   "clauses_analysis": [
     {
-      "clause": "Name of the section/clause (translated to the document's language)",
-      "analysis": "Extremely detailed analysis of this specific clause written in the document's language"
+      "clause": "Name of the section/clause in English",
+      "analysis": "Extremely detailed analysis of this specific clause written in English"
     }
   ],
   "ai_confidence": A float between 0.0 and 1.0
@@ -91,7 +89,7 @@ PROMPT;
                         ['role' => 'system', 'content' => $systemPrompt],
                         ['role' => 'user', 'content' => $text],
                     ],
-                    'temperature' => 0.1, // لضمان دقة الالتزام بالقواعد والـ JSON وطول السطور
+                    'temperature' => 0.1, // low temperature for strict compliance
                     'response_format' => ['type' => 'json_object'],
                 ]);
 
