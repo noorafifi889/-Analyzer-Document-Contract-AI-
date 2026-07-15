@@ -50,7 +50,7 @@
                     <div>
                         <p class="px-4 pt-3 pb-1 text-label-sm font-bold text-on-surface-variant">Documents</p>
                         <template x-for="doc in results.documents" :key="doc.id">
-                            <a :href="`//${doc.id}`" class="flex items-center gap-2 px-4 py-2 hover:bg-surface-container-high transition-colors">
+                            <a :href="`/intelligence/${doc.id}`" class="flex items-center gap-2 px-4 py-2 hover:bg-surface-container-high transition-colors">
                                 <span class="material-symbols-outlined text-lg text-on-surface-variant">description</span>
                                 <span class="text-body-md truncate" x-text="doc.title"></span>
                             </a>
