@@ -79,3 +79,19 @@ Route::middleware('auth')->group(function () {
 });
 
 
+Route::middleware(['auth'])->group(function () {
+    // جلب الإشعارات
+    Route::get('/api/notifications', function () {
+        $user = auth()->user();
+        return response()->json([
+            'notifications' => $user->notifications()->take(10)->get(),
+            'unread_count'  => $user->unreadNotifications()->count()
+        ]);
+    });
+
+    // تعيين الإشعارات كمقروءة
+    Route::post('/api/notifications/read', function () {
+        auth()->user()->unreadNotifications->markAsRead();
+        return response()->json(['status' => 'success']);
+    });
+});
