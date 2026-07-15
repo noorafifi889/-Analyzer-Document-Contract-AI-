@@ -17,7 +17,6 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
-
     /**
      * Get the attributes that should be cast.
      *
@@ -35,4 +34,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(Document::class);
     }
+    public function logins()
+{
+    return $this->hasMany(Login::class);
+}
 }
