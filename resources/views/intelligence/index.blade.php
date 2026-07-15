@@ -118,7 +118,7 @@
                     @if ($recentDocuments->isNotEmpty())
                         <div
                             class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm divide-y divide-slate-100">
-                            @foreach ($recentDocuments->take(5) as $recent)
+@foreach ($recentDocuments as $recent)
                                 <a href="{{ route('intelligence.show', $recent->id) }}"
                                     class="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group">
                                     <div class="flex items-center gap-3 min-w-0">

@@ -6,13 +6,10 @@ use Illuminate\Http\Request;
 
 class ContractIntelligenceController extends Controller
 {
-    // عند الضغط على السايدبار لأول مرة
     public function index()
     {
-        // جلب آخر الملفات المرفوعة ليختار منها المستخدم إذا لم يرد رفع ملف جديد
-        $recentDocuments = Document::latest()->take(5)->get();
+        $recentDocuments = auth()->user()->documents()->latest()->take(5)->get();
         
-        // نمرر المتغير كـ null لنعلم الـ Blade أننا في وضع "الانتظار/الرفع"
         return view('intelligence.index', [
             'document' => null,
             'recentDocuments' => $recentDocuments
@@ -22,12 +19,16 @@ class ContractIntelligenceController extends Controller
     // عند اختيار ملف أو بعد رفعه والتحويل إليه
     public function show(Document $document)
     {
-        // جلب التحليلات المرتبطة بهذا الملف تحديداً
+        abort_if($document->user_id !== auth()->id(), 403);
+
         $analysis = $document->analyses()->first(); // أو العلاقات الخاصة بك
         
+        $recentDocuments = auth()->user()->documents()->latest()->take(5)->get();
+
         return view('intelligence.index', [
             'document' => $document,
-            'analysis' => $analysis
+            'analysis' => $analysis,
+            'recentDocuments' => $recentDocuments // أضفناها هنا لضمان عمل القائمة الجانبية
         ]);
     }
 }
