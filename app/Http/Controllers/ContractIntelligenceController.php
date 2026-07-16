@@ -10,7 +10,7 @@ class ContractIntelligenceController extends Controller
     {
         $recentDocuments = auth()->user()->documents()->latest()->take(5)->get();
         
-        return view('intelligence.index', [
+        return view('intelligence.show', [
             'document' => null,
             'recentDocuments' => $recentDocuments
         ]);
@@ -25,7 +25,7 @@ class ContractIntelligenceController extends Controller
         
         $recentDocuments = auth()->user()->documents()->latest()->take(5)->get();
 
-        return view('intelligence.index', [
+        return view('intelligence.show', [
             'document' => $document,
             'analysis' => $analysis,
             'recentDocuments' => $recentDocuments // أضفناها هنا لضمان عمل القائمة الجانبية
