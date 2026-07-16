@@ -59,8 +59,7 @@
 <body x-data class="font-body-md text-on-surface bg-background">
     @include('layouts.partials.sidebar')
 
-    <!-- lg:ml-[280px] يبعد المحتوى عن الـ sidebar بس على الشاشات الكبيرة (فوق 1024px) -->
-    <main class="lg:ml-[280px] min-h-screen">
+  <main class="lg:ml-[280px] min-h-screen">
 
         @include('layouts.partials.header')
 
@@ -72,9 +71,7 @@
 
     </main>
 
-    <button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center z-50">
-        <span class="material-symbols-outlined text-2xl" data-icon="chat" style="font-variation-settings: 'FILL' 1;">chat</span>
-    </button>
+    @include('layouts.partials.global-chat')
 
     <script>
         // منع تحديث الصفحة عند الضغط على الروابط الفارغة
@@ -88,44 +85,11 @@
         const searchInput = document.querySelector('input[type="text"]');
         if(searchInput) {
             searchInput.addEventListener('focus', () => {
-                searchInput.parentElement.classList.add('ring-1', 'ring-primary');
+                searchInput.parentElement.classList.add('ring-1', 'rinring-primary');
             });
             searchInput.addEventListener('blur', () => {
                 searchInput.parentElement.classList.remove('ring-1', 'ring-primary');
             });
-        }
-
-        // --- حل مشكلة الأخطاء الحمراء في الكونسول ---
-        // تعريف دالة البحث الخاصة بالهيدر ليتعرف عليها Alpine.js
-        function headerSearch() {
-            return {
-                query: '',
-                results: null,
-                loading: false,
-                open: false,
-
-                async search() {
-                    if (this.query.trim().length < 2) {
-                        this.results = null;
-                        this.open = false;
-                        return;
-                    }
-
-                    this.loading = true;
-                    try {
-                        // تأكد من تغيير الرابط أدناه إذا كان مختلفاً في مشروعك
-                        const res = await fetch(`/search/live?q=${encodeURIComponent(this.query)}`, {
-                            headers: { 'Accept': 'application/json' }
-                        });
-                        this.results = await res.json();
-                        this.open = true;
-                    } catch (e) {
-                        console.error('Search error:', e);
-                    } finally {
-                        this.loading = false;
-                    }
-                }
-            }
         }
     </script>
     
