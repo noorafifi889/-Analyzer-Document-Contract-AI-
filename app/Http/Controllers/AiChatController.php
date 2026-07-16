@@ -109,4 +109,5 @@ public function sendMessage(Request $request, Document $document)
         return response()->json(['error' => 'An internal server error occurred.'], 500);
     }
 }
+
 }

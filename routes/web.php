@@ -4,6 +4,7 @@ use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\ContractIntelligenceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\GlobalAiChatController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
@@ -95,3 +96,6 @@ Route::middleware(['auth'])->group(function () {
         return response()->json(['status' => 'success']);
     });
 });
+
+
+Route::post('/global-chat/send', [GlobalAiChatController::class, 'sendMessage'])->name('global.chat.send');
