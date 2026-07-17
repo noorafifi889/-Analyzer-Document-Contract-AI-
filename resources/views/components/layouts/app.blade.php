@@ -255,7 +255,7 @@
         </header>
     @endunless
     <main
-        class="pt-[120px] pb-xxl min-h-screen flex flex-col items-center justify-center px-gutter w-full max-w-container-max mx-auto">
+        class="pt-[120px]  min-h-screen flex flex-col items-center justify-center px-gutter w-full max-w-container-max mx-auto">
         {{ $slot }}
     </main>
 

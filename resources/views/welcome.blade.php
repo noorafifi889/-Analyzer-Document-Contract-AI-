@@ -1,200 +1,262 @@
 <x-layouts.app>
-<div class="w-full relative overflow-hidden bg-background antialiased selection:bg-primary/20 selection:text-primary">
-    
-    <!-- خلفية شبكية جمالية خفيفة جداً لمنح التصميم عمقاً هندسياً -->
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"></div>
-
-    <!-- البطل (Hero Section) -->
-    <section class="relative flex flex-col items-center text-center pt-20 pb-16 md:pt-28 md:pb-24 max-w-5xl mx-auto px-4 z-10">
-        <!-- إضاءة نيون خلفية عملاقة وخافتة -->
-        <div class="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-gradient-to-tr from-primary/10 to-tertiary/5 rounded-full blur-[120px] pointer-events-none"></div>
-
-        <!-- شارة علوية أنيقة -->
-        <span class="inline-flex items-center gap-xs px-4 py-1.5 rounded-full font-label-md text-label-md bg-primary/10 text-primary border border-primary/20 mb-xl animate-fade-in backdrop-blur-md">
-            <span class="material-symbols-outlined text-[18px] animate-pulse">policy</span>
-            AI-Powered Document Intelligence & Security
-        </span>
-        
-        <!-- عنوان رئيسي ضخم وقوي -->
-        <h1 class="font-headline-xl text-[44px] md:text-[68px] leading-[1.1] tracking-tight text-on-surface font-black mb-lg max-w-4xl">
-            Drop Massive Contracts. <br class="hidden sm:inline">
-            <span class="bg-gradient-to-r from-primary via-primary-fixed-dim to-tertiary bg-clip-text text-transparent">Extract Insights Instantly.</span>
-        </h1>
-        
-        <!-- الوصف الفرعي مريح للعين -->
-        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl mx-auto mb-2xl leading-relaxed text-opacity-90">
-            Upload PDFs or Word docs. LexiGuard AI instantly sanitizes formatting, generates crystal-clear summaries, alerts you to critical risks, and lets you chat directly with your document. 
+<section class="relative max-w-[1280px] mx-auto px-6 md:px-10 pt-16 md:pt-20 pb-24 grid md:grid-cols-2 gap-16 items-center">
+    <div class="absolute top-[-140px] left-[-160px] w-[520px] h-[520px] bg-primary/10 rounded-full blur-[130px] pointer-events-none"></div>
+ 
+    <div class="relative z-10 fade-up">
+      <div class="inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.14em] uppercase text-primary bg-primary/8 border border-primary/20 px-3 py-1.5 rounded-full mb-7">
+        <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+        AI Contract Intelligence
+      </div>
+ 
+      <h1 class="font-display text-[46px] md:text-[64px] leading-[1.05] font-semibold tracking-tight text-on-surface mb-7">
+        The fine print<br>
+        <span class="italic text-primary">doesn't stand</span> a chance.
+      </h1>
+ 
+      <p class="text-[17px] leading-[1.7] text-on-surface-variant max-w-md mb-9">
+        Drop in any contract, policy, or agreement. LexiGuard reads every clause in seconds, flags what's dangerous, and answers your questions — in plain English, with citations.
+      </p>
+ 
+      <div class="flex flex-wrap items-center gap-4 mb-8">
+        <a href="{{ route('register') }}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-md bg-primary text-on-primary font-semibold text-[15px] shadow-[0_10px_30px_-8px_rgba(0,74,198,0.55)] hover:scale-[1.02] active:scale-[0.98] transition-all">
+          Analyze your first file free
+          <span class="material-symbols-outlined text-[19px]">arrow_forward</span>
+        </a>
+        <a href="#process" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-md border border-outline text-on-surface font-medium text-[15px] hover:bg-surface-container-low transition-colors">
+          <span class="material-symbols-outlined text-[19px]">play_circle</span>
+          See a live scan
+        </a>
+      </div>
+ 
+      <p class="font-mono text-[11px] tracking-wide text-on-surface-variant/80 uppercase">
+        Encrypted uploads · Files never used to train models · Delete anytime
+      </p>
+    </div>
+ 
+    <!-- signature element: scanning contract mock -->
+    <div class="relative z-10 flex justify-center md:justify-end fade-up" style="animation-delay:.15s">
+      <div class="relative w-full max-w-[380px]">
+        <div class="relative bg-surface-container-lowest border border-outline-variant rounded-sm shadow-[0_30px_60px_-20px_rgba(25,27,35,0.25)] rotate-[1.5deg] overflow-hidden paper-lines" style="aspect-ratio: 8.5/11;">
+          <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-primary/25 via-primary/10 to-transparent animate-scan"></div>
+          </div>
+ 
+          <div class="relative px-7 pt-8 pb-3 border-b border-outline-variant/60">
+            <div class="font-mono text-[9px] tracking-[0.15em] text-on-surface-variant/70 uppercase">Master Services Agreement</div>
+            <div class="font-mono text-[9px] tracking-[0.1em] text-on-surface-variant/50 uppercase mt-0.5">Ref. 2291-B — Reviewed by LexiGuard</div>
+          </div>
+ 
+          <div class="relative px-7 pt-6 space-y-3">
+            <div class="h-[7px] bg-on-surface/[0.08] rounded-full w-full"></div>
+            <div class="h-[7px] bg-on-surface/[0.08] rounded-full w-11/12"></div>
+            <div class="h-[7px] bg-on-surface/[0.08] rounded-full w-4/5"></div>
+ 
+            <div class="relative border-l-[3px] border-tertiary bg-tertiary/10 pl-3.5 py-3 my-4 rounded-r-sm">
+              <div class="h-[7px] bg-tertiary/40 rounded-full w-10/12 mb-2"></div>
+              <div class="h-[7px] bg-tertiary/40 rounded-full w-7/12"></div>
+            </div>
+ 
+            <div class="h-[7px] bg-on-surface/[0.08] rounded-full w-full"></div>
+            <div class="h-[7px] bg-on-surface/[0.08] rounded-full w-3/4"></div>
+            <div class="h-[7px] bg-on-surface/[0.08] rounded-full w-5/6"></div>
+            <div class="h-[7px] bg-on-surface/[0.08] rounded-full w-2/3"></div>
+          </div>
+        </div>
+ 
+        <div class="absolute -right-9 top-[30%] bg-surface-container-lowest border border-tertiary/30 shadow-xl rounded-lg px-3.5 py-2.5 flex items-center gap-2 text-[12.5px] font-semibold text-on-tertiary-fixed-variant animate-float max-w-[190px]">
+          <span class="material-symbols-outlined text-[17px] text-tertiary shrink-0">warning</span>
+          Auto-renewal clause detected
+        </div>
+ 
+        <div class="absolute -left-10 bottom-8 bg-secondary text-white shadow-xl rounded-xl rounded-bl-sm px-4 py-3 max-w-[210px] text-[12.5px] leading-snug animate-float-delay">
+          "What's the termination window?"
+          <span class="block mt-1.5 text-white/75 font-mono text-[10.5px]">→ 30 days written notice, §4.2</span>
+        </div>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- ================= TRUST STRIP ================= -->
+  <section class="border-y border-outline-variant/70 bg-surface-container-low">
+    <div class="max-w-[1280px] mx-auto px-6 md:px-10 py-8 flex flex-col sm:flex-row items-center justify-center divide-y sm:divide-y-0 sm:divide-x divide-outline-variant/70 gap-6 sm:gap-0 text-center">
+      <div class="sm:px-12 pt-4 sm:pt-0">
+        <div class="font-display text-[30px] font-semibold text-on-surface">5 sec<span class="text-on-surface-variant/60 text-[18px] font-sans"> / 50-page scan</span></div>
+        <div class="font-mono text-[11px] tracking-wide uppercase text-on-surface-variant mt-1">Full-document read</div>
+      </div>
+      <div class="sm:px-12 pt-4 sm:pt-0">
+        <div class="font-display text-[30px] font-semibold text-on-surface">15 hrs<span class="text-on-surface-variant/60 text-[18px] font-sans"> / week saved</span></div>
+        <div class="font-mono text-[11px] tracking-wide uppercase text-on-surface-variant mt-1">Reported by legal &amp; HR teams</div>
+      </div>
+      <div class="sm:px-12 pt-4 sm:pt-0">
+        <div class="font-display text-[30px] font-semibold text-on-surface">0<span class="text-on-surface-variant/60 text-[18px] font-sans"> clauses missed</span></div>
+        <div class="font-mono text-[11px] tracking-wide uppercase text-on-surface-variant mt-1">Every line, cited</div>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- ================= AUDIENCE ================= -->
+  <section id="audience" class="max-w-[1280px] mx-auto px-6 md:px-10 py-24 md:py-28">
+    <div class="max-w-xl mb-16">
+      <span class="font-mono text-[11px] tracking-[0.14em] uppercase text-on-surface-variant">Built for high-stakes review</span>
+      <h2 class="font-display text-[34px] md:text-[42px] font-semibold tracking-tight mt-3 leading-[1.15]">
+        Two teams. One document.<br>Zero patience for surprises.
+      </h2>
+    </div>
+ 
+    <div class="grid md:grid-cols-2 border-t border-outline-variant">
+      <div class="border-b md:border-b-0 md:border-r border-outline-variant py-10 md:pr-14">
+        <div class="flex items-center gap-3 text-primary mb-5">
+          <span class="material-symbols-outlined text-[26px]">gavel</span>
+          <span class="font-mono text-[12px] tracking-[0.1em] uppercase text-on-surface-variant">For counsel</span>
+        </div>
+        <h3 class="font-display text-[26px] font-semibold mb-4">Legal teams &amp; attorneys</h3>
+        <p class="text-on-surface-variant leading-[1.75] mb-6">
+          Scan multi-page contracts, NDAs, and vendor agreements before your first coffee is cold. Catch non-compete traps, indemnity gaps, and compliance exposure without reading line by line.
         </p>
-        
-        <!-- أزرار الدعوة للإجراء (CTA) تفاعلية وممتازة -->
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-md w-full sm:w-auto">
-            <a href="{{ route('register') }}" class="w-full sm:w-auto flex items-center justify-center gap-sm px-xl py-md font-body-md text-body-md bg-primary text-on-primary rounded-xl hover:bg-primary/95 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-primary/25 font-bold group">
-                Analyze Your First File Free
-                <span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">upload_file</span>
-            </a>
-            <a href="#" class="w-full sm:w-auto flex items-center justify-center gap-sm px-xl py-md font-body-md text-body-md bg-surface-container-high border border-outline-variant text-on-surface hover:bg-surface-container-highest hover:border-outline transition-all rounded-xl font-medium">
-                <span class="material-symbols-outlined text-[20px] text-on-surface-variant">play_circle</span>
-                See How It Works
-            </a>
+        <div class="flex flex-wrap gap-2">
+          <span class="text-[12.5px] font-medium px-3 py-1.5 rounded-full bg-primary/8 text-primary border border-primary/15">NDAs</span>
+          <span class="text-[12.5px] font-medium px-3 py-1.5 rounded-full bg-primary/8 text-primary border border-primary/15">Vendor agreements</span>
+          <span class="text-[12.5px] font-medium px-3 py-1.5 rounded-full bg-primary/8 text-primary border border-primary/15">Compliance review</span>
         </div>
-    </section>
-
-    <!-- فاصل ناعم متلاشي -->
-    <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-outline-variant/60 to-transparent my-md"></div>
-
-    <!-- قسم الفئات المستهدفة (Target Audience) -->
-    <section class="py-16 px-4 max-w-6xl mx-auto relative z-10">
-        <div class="text-center max-w-2xl mx-auto mb-2xl">
-            <span class="font-label-md text-label-md text-tertiary uppercase tracking-widest font-extrabold bg-tertiary/10 px-3 py-1 rounded-md">Built For Professionals</span>
-            <h2 class="font-headline-lg text-[32px] md:text-headline-lg font-bold text-on-surface mt-sm">Tailored for High-Stakes Document Review</h2>
+      </div>
+ 
+      <div class="pt-10 md:pt-10 md:pl-14">
+        <div class="flex items-center gap-3 text-secondary mb-5">
+          <span class="material-symbols-outlined text-[26px]">groups</span>
+          <span class="font-mono text-[12px] tracking-[0.1em] uppercase text-on-surface-variant">For people ops</span>
         </div>
-        
-        <div class="grid md:grid-cols-2 gap-xl">
-            <!-- كرت المحامين -->
-            <div class="bento-card p-xl rounded-2xl bg-surface-container-low border border-outline-variant/70 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 flex flex-col justify-between group">
-                <div>
-                    <div class="flex items-center gap-sm text-primary mb-md">
-                        <div class="p-2 rounded-xl bg-primary/10 group-hover:bg-primary group-hover:text-on-primary transition-colors">
-                            <span class="material-symbols-outlined text-[32px] block">gavel</span>
-                        </div>
-                        <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Legal Teams & Attorneys</h3>
-                    </div>
-                    <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                        Scan massive multi-page contracts, NDAs, and agreements in seconds. Spot hidden liabilities, non-compete traps, and critical compliance issues without missing a single clause.
-                    </p>
-                </div>
-            </div>
-            
-            <!-- كرت الموارد البشرية -->
-            <div class="bento-card p-xl rounded-2xl bg-surface-container-low border border-outline-variant/70 hover:border-tertiary/40 transition-all duration-300 hover:shadow-xl hover:shadow-tertiary/5 flex flex-col justify-between group">
-                <div>
-                    <div class="flex items-center gap-sm text-tertiary mb-md">
-                        <div class="p-2 rounded-xl bg-tertiary/10 group-hover:bg-tertiary group-hover:text-on-tertiary transition-colors">
-                            <span class="material-symbols-outlined text-[32px] block">groups</span>
-                        </div>
-                        <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">HR & People Operations</h3>
-                    </div>
-                    <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                        Streamline employment agreements, corporate policies, and onboarding paperwork. Ensure absolute alignment with company standards and flag high-risk terms instantly.
-                    </p>
-                </div>
-            </div>
+        <h3 class="font-display text-[26px] font-semibold mb-4">HR &amp; people operations</h3>
+        <p class="text-on-surface-variant leading-[1.75] mb-6">
+          Run employment agreements and onboarding paperwork through LexiGuard before they hit a signature line. Stay aligned with company policy and catch high-risk terms instantly.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="text-[12.5px] font-medium px-3 py-1.5 rounded-full bg-secondary/8 text-secondary border border-secondary/15">Offer letters</span>
+          <span class="text-[12.5px] font-medium px-3 py-1.5 rounded-full bg-secondary/8 text-secondary border border-secondary/15">Policy docs</span>
+          <span class="text-[12.5px] font-medium px-3 py-1.5 rounded-full bg-secondary/8 text-secondary border border-secondary/15">Onboarding packs</span>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- ================= FEATURES AS CLAUSE LIST ================= -->
+<section id="clauses" class="bg-surface-container-low border-y border-outline-variant/70">
+    <div class="max-w-[1280px] mx-auto px-6 md:px-10 py-16 md:py-20">
+      <div class="max-w-xl mb-10">
+        <span class="font-mono text-[11px] tracking-[0.14em] uppercase text-on-surface-variant">Article II</span>
+        <h2 class="font-display text-[28px] md:text-[34px] font-semibold tracking-tight mt-2 leading-[1.15]">
+          What happens the moment you hit upload
+        </h2>
+      </div>
 
-    <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-outline-variant/60 to-transparent my-md"></div>
-
-    <!-- قسم المميزات الخارقة (Features Bento Grid) -->
-    <section class="py-20 px-4 max-w-6xl mx-auto relative z-10">
-        <div class="text-center max-w-2xl mx-auto mb-2xl">
-            <h2 class="font-headline-lg text-[32px] md:text-headline-lg text-on-surface font-bold mb-sm tracking-tight">Turn Messy Files Into Actionable Intel</h2>
-            <p class="font-body-md text-body-md text-on-surface-variant">LexiGuard AI processes, dissects, and guards your business data effortlessly.</p>
+      <div class="grid md:grid-cols-2 border-t border-l border-outline-variant">
+        <div class="group flex gap-4 items-start p-6 md:p-7 border-b border-r border-outline-variant">
+          <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center text-primary shrink-0">
+            <span class="material-symbols-outlined text-[20px]">summarize</span>
+          </div>
+          <div>
+            <div class="font-mono text-[11px] text-on-surface-variant/50 mb-1">§ 1</div>
+            <h3 class="font-display text-[18px] font-semibold mb-1.5">Instant executive summaries</h3>
+            <p class="text-on-surface-variant text-[14.5px] leading-[1.65]">A bulletproof overview of a 50-page document in under five seconds — the intent, without the fluff.</p>
+          </div>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-lg">
-            <!-- ميزة 1 -->
-            <div class="bento-card p-xl rounded-2xl bg-surface-container-lowest border border-outline-variant hover:border-outline hover:scale-[1.01] hover:shadow-lg transition-all duration-300 group">
-                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-md group-hover:bg-primary group-hover:text-on-primary transition-all duration-300 shadow-sm">
-                    <span class="material-symbols-outlined text-[26px]">summarize</span>
-                </div>
-                <h3 class="font-headline-sm text-headline-sm font-bold mb-xs text-on-surface">Instant Executive Summaries</h3>
-                <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">Get a bulletproof, high-level overview of 50+ page documents in under 5 seconds. Understand the core intent without reading the fluff.</p>
-            </div>
-
-            <!-- ميزة 2 -->
-            <div class="bento-card p-xl rounded-2xl bg-surface-container-lowest border border-outline-variant hover:border-error/40 hover:scale-[1.01] hover:shadow-lg transition-all duration-300 group">
-                <div class="w-12 h-12 rounded-xl bg-error-container/60 flex items-center justify-center text-error mb-md group-hover:bg-error group-hover:text-on-error transition-all duration-300 shadow-sm">
-                    <span class="material-symbols-outlined text-[26px]">report</span>
-                </div>
-                <h3 class="font-headline-sm text-headline-sm font-bold mb-xs text-on-surface">Critical Risk Red-Flagging</h3>
-                <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">Our AI automatically highlights high-risk clauses, predatory terms, or financial anomalies, giving you complete tactical awareness.</p>
-            </div>
-
-            <!-- ميزة 3 (تم إصلاح الأيقونة والتاغ التالف هنا) -->
-            <div class="bento-card p-xl rounded-2xl bg-surface-container-lowest border border-outline-variant hover:border-secondary/40 hover:scale-[1.01] hover:shadow-lg transition-all duration-300 group">
-                <div class="w-12 h-12 rounded-xl bg-secondary-container/60 flex items-center justify-center text-secondary mb-md group-hover:bg-secondary group-hover:text-on-secondary transition-all duration-300 shadow-sm">
-                    <span class="material-symbols-outlined text-[26px]">chat</span>
-                </div>
-                <h3 class="font-headline-sm text-headline-sm font-bold mb-xs text-on-surface">Interactive Document Chatbot</h3>
-                <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">Ask questions directly to your file. Type queries like *"What is the termination policy?"* or *"Is there an expiration date?"* and get precise citations.</p>
-            </div>
-
-            <!-- ميزة 4 -->
-            <div class="bento-card p-xl rounded-2xl bg-surface-container-lowest border border-outline-variant hover:border-primary/40 hover:scale-[1.01] hover:shadow-lg transition-all duration-300 group">
-                <div class="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center text-on-primary-fixed-variant mb-md group-hover:bg-primary-container group-hover:text-on-primary-container transition-all duration-300 shadow-sm">
-                    <span class="material-symbols-outlined text-[26px]">description</span>
-                </div>
-                <h3 class="font-headline-sm text-headline-sm font-bold mb-xs text-on-surface">Sanitized Plain-Text Conversion</h3>
-                <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">Converts PDFs and Word docs into clean, raw, unstructured text while stripping out tracking elements and unsecure hidden code.</p>
-            </div>
-        </div>
-    </section>
-
-    <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-outline-variant/60 to-transparent my-md"></div>
-
-    <!-- قسم خطوات العمل الخطيّة (Steps Review) -->
-    <section class="py-20 px-4 w-full max-w-6xl mx-auto relative z-10">
-        <div class="text-center max-w-2xl mx-auto mb-2xl">
-            <h2 class="font-headline-lg text-[32px] md:text-headline-lg text-on-surface font-bold mb-sm">How LexiGuard Protects Your Workflow</h2>
-            <p class="font-body-md text-body-md text-on-surface-variant">Upload to audit in three seamless steps.</p>
+        <div class="group flex gap-4 items-start p-6 md:p-7 border-b border-r border-outline-variant">
+          <div class="w-10 h-10 rounded-md bg-tertiary/10 flex items-center justify-center text-tertiary shrink-0">
+            <span class="material-symbols-outlined text-[20px]">report</span>
+          </div>
+          <div>
+            <div class="font-mono text-[11px] text-on-surface-variant/50 mb-1">§ 2</div>
+            <h3 class="font-display text-[18px] font-semibold mb-1.5">Critical risk red-flagging</h3>
+            <p class="text-on-surface-variant text-[14.5px] leading-[1.65]">High-risk clauses and financial anomalies get flagged automatically, before you sign anything.</p>
+          </div>
         </div>
 
-        <!-- الخطوات مع روابط بصرية منقطة دقيقة جدًا بين المراحل -->
-        <div class="grid md:grid-cols-3 gap-xl relative">
-            
-            <!-- الخطوة 1 -->
-            <div class="space-y-sm relative p-md rounded-xl hover:bg-surface-container-low transition-all">
-                <div class="font-label-md text-label-md font-black tracking-widest text-primary uppercase bg-primary/10 w-fit px-2 py-0.5 rounded">Step 1</div>
-                <h3 class="font-headline-sm text-[20px] font-bold text-on-surface flex items-center gap-xs mt-sm">
-                    <span class="material-symbols-outlined text-primary">cloud_upload</span> Secure Upload
-                </h3>
-                <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">Drag and drop your PDF or Word document. Your data is encrypted and remains strictly confidential.</p>
-            </div>
-
-            <!-- الخطوة 2 -->
-            <div class="space-y-sm relative p-md rounded-xl hover:bg-surface-container-low transition-all">
-                <div class="font-label-md text-label-md font-black tracking-widest text-tertiary uppercase bg-tertiary/10 w-fit px-2 py-0.5 rounded">Step 2</div>
-                <h3 class="font-headline-sm text-[20px] font-bold text-on-surface flex items-center gap-xs mt-sm">
-                    <span class="material-symbols-outlined text-tertiary">troubleshoot</span> Deep AI Audit
-                </h3>
-                <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">LexiGuard scans for hidden risks, generates an interactive summary, and maps out critical data points.</p>
-            </div>
-
-            <!-- الخطوة 3 -->
-            <div class="space-y-sm relative p-md rounded-xl hover:bg-surface-container-low transition-all">
-                <div class="font-label-md text-label-md font-black tracking-widest text-primary uppercase bg-primary/10 w-fit px-2 py-0.5 rounded">Step 3</div>
-                <h3 class="font-headline-sm text-[20px] font-bold text-on-surface flex items-center gap-xs mt-sm">
-                    <span class="material-symbols-outlined text-primary">forum</span> Chat & Extract
-                </h3>
-                <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">Review the flagged risks and use the inline AI Chatbot to ask any follow-up questions about the text.</p>
-            </div>
+        <div class="group flex gap-4 items-start p-6 md:p-7 border-r border-outline-variant">
+          <div class="w-10 h-10 rounded-md bg-secondary/10 flex items-center justify-center text-secondary shrink-0">
+            <span class="material-symbols-outlined text-[20px]">chat</span>
+          </div>
+          <div>
+            <div class="font-mono text-[11px] text-on-surface-variant/50 mb-1">§ 3</div>
+            <h3 class="font-display text-[18px] font-semibold mb-1.5">Interactive document chat</h3>
+            <p class="text-on-surface-variant text-[14.5px] leading-[1.65]">Ask your file directly — "what's the termination policy?" — and get precise, cited answers.</p>
+          </div>
         </div>
-    </section>
 
-    <!-- الإغلاق الساحر وعقد الصفقة (CTA Box) -->
-    <section class="py-20 px-4 text-center max-w-5xl mx-auto w-full relative z-10">
-        <div class="relative bg-gradient-to-b from-surface-container-high to-surface-container rounded-3xl p-xl md:p-xxl border border-outline-variant/80 shadow-2xl overflow-hidden group">
-            <!-- إضاءة بؤرية دائرية مدمجة داخل الكرت -->
-            <div class="absolute -bottom-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -top-20 -left-20 w-64 h-64 bg-tertiary/5 rounded-full blur-3xl pointer-events-none"></div>
-            
-            <div class="relative z-10 space-y-lg">
-                <h2 class="font-headline-lg text-[32px] md:text-[46px] font-black tracking-tight text-on-surface leading-tight">
-                    Stop Reviewing Contracts Manually.
-                </h2>
-                <p class="font-body-md text-body-md text-on-surface-variant max-w-xl mx-auto text-opacity-90">
-                    Join modern HR managers and legal counsels who save over 15 hours a week using LexiGuard AI.
-                </p>
-
-                <div class="pt-md flex justify-center">
-                    <a href="{{ route('register') }}" class="inline-flex items-center gap-sm px-xl py-md font-body-md text-body-md bg-primary text-on-primary font-bold rounded-xl hover:scale-[1.03] active:scale-[0.98] transition-all shadow-xl shadow-primary/25 group">
-                        <span class="material-symbols-outlined text-[22px] group-hover:rotate-12 transition-transform">security</span>
-                        Get Started Now (Free Dashboard Access)
-                    </a>
-                </div>
-            </div>
+        <div class="group flex gap-4 items-start p-6 md:p-7">
+          <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center text-primary shrink-0">
+            <span class="material-symbols-outlined text-[20px]">description</span>
+          </div>
+          <div>
+            <div class="font-mono text-[11px] text-on-surface-variant/50 mb-1">§ 4</div>
+            <h3 class="font-display text-[18px] font-semibold mb-1.5">Sanitized plain-text extraction</h3>
+            <p class="text-on-surface-variant text-[14.5px] leading-[1.65]">PDFs and Word docs converted into clean text — tracking elements and hidden code stripped out.</p>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
+  <!-- ================= PROCESS ================= -->
+  <section id="process" class="max-w-[1280px] mx-auto px-6 md:px-10 py-24 md:py-28">
+    <div class="max-w-xl mb-16">
+      <span class="font-mono text-[11px] tracking-[0.14em] uppercase text-on-surface-variant">The workflow</span>
+      <h2 class="font-display text-[34px] md:text-[42px] font-semibold tracking-tight mt-3 leading-[1.15]">
+        Upload to audit in three moves
+      </h2>
+    </div>
+ 
+    <div class="relative grid md:grid-cols-3 gap-12 md:gap-8">
+      <div class="hidden md:block absolute top-[27px] left-[16.5%] right-[16.5%] h-px bg-[repeating-linear-gradient(to_right,#737686_0,#737686_6px,transparent_6px,transparent_12px)]"></div>
+ 
+      <div class="relative">
+        <div class="w-[54px] h-[54px] rounded-full border-2 border-primary bg-surface flex items-center justify-center text-primary relative z-10 mb-6">
+          <span class="material-symbols-outlined text-[24px]">cloud_upload</span>
+        </div>
+        <h3 class="font-display text-[20px] font-semibold mb-2">Secure upload</h3>
+        <p class="text-on-surface-variant leading-[1.75] text-[15px]">Drag in a PDF or Word file. Encrypted in transit and at rest, and never used to train any model.</p>
+      </div>
+ 
+      <div class="relative">
+        <div class="w-[54px] h-[54px] rounded-full border-2 border-tertiary bg-surface flex items-center justify-center text-tertiary relative z-10 mb-6">
+          <span class="material-symbols-outlined text-[24px]">troubleshoot</span>
+        </div>
+        <h3 class="font-display text-[20px] font-semibold mb-2">Deep AI audit</h3>
+        <p class="text-on-surface-variant leading-[1.75] text-[15px]">LexiGuard scans for hidden risk, builds an interactive summary, and maps every critical data point.</p>
+      </div>
+ 
+      <div class="relative">
+        <div class="w-[54px] h-[54px] rounded-full border-2 border-secondary bg-surface flex items-center justify-center text-secondary relative z-10 mb-6">
+          <span class="material-symbols-outlined text-[24px]">forum</span>
+        </div>
+        <h3 class="font-display text-[20px] font-semibold mb-2">Chat &amp; extract</h3>
+        <p class="text-on-surface-variant leading-[1.75] text-[15px]">Review flagged risks, then ask the inline chatbot follow-up questions about anything in the text.</p>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- ================= FINAL CTA ================= -->
+  <section class="w-full  ">
+    <div class="relative w-full bg-[#101426] text-white overflow-hidden rounded-md">
+      <div class="absolute -top-24 -right-24 w-72 h-72 bg-primary/25 rounded-full blur-[100px] pointer-events-none"></div>
+      <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-tertiary/20 rounded-full blur-[100px] pointer-events-none"></div>
 
-</div>
+      <div class="relative z-10 px-3 md:px-6 py-10 text-center max-w-2xl mx-auto ">
+        <h2 class="font-display text-[34px] md:text-[46px] font-semibold tracking-tight leading-[1.15] mb-6">
+          Stop reviewing contracts the slow way.
+        </h2>
+        <p class="text-white/65 text-[16px] leading-[1.7] mb-10 max-w-lg mx-auto">
+          Join the legal and HR teams who read every clause and still get their evenings back.
+        </p>
+
+        <a href="{{ route('register') }}" class="inline-flex items-center gap-2.5 px-7 py-4 rounded-md bg-white text-[#101426] font-semibold text-[15.5px] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-xl">
+          <span class="material-symbols-outlined text-[20px]">security</span>
+          Get free dashboard access
+        </a>
+
+        <svg class="mx-auto mt-12 opacity-40" width="150" height="34" viewBox="0 0 150 34" fill="none">
+          <path d="M2 24C10 8 16 8 22 20C28 32 34 6 42 16C50 26 56 10 64 14C72 18 78 30 86 20C94 10 100 6 108 18C114 27 120 12 128 16C134 19 140 27 148 14" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+ 
 </x-layouts.app>
