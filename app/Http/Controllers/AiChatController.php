@@ -24,13 +24,12 @@ class AiChatController extends Controller
 
         return view('intelligence.chatAi', compact('document', 'chats', 'analysis'));
     }
-
-    /**
+/**
      * Send the user's prompt along with the document context to the AI model.
      */
     public function sendMessage(Request $request, Document $document)
     {
-        // 🌟 خطوة 3: التحقق من الصلاحية قبل إرسال الرسالة وحفظها في قاعدة البيانات
+        // التحقق من الصلاحية قبل إرسال الرسالة وحفظها في قاعدة البيانات
         Gate::authorize('view', $document);
 
         $request->validate([
@@ -39,7 +38,7 @@ class AiChatController extends Controller
 
         $contractContent = $document->extracted_text ?? '';
 
-        // تقصير النص لتفادي rate_limit_exceeded (TPM limit)
+        // تقصير النص لتفادي تجاوز الحد المسموح
         $maxChars = 12000;
         if (mb_strlen($contractContent) > $maxChars) {
             $contractContent = mb_substr($contractContent, 0, $maxChars)
@@ -47,60 +46,80 @@ class AiChatController extends Controller
         }
 
         try {
-            $systemPrompt = "You are an expert legal AI assistant specializing in contract analysis.\n\n"
-                          . "Here is the exact text content extracted from the uploaded document/file:\n"
-                          . "--- START OF EXTRACTED TEXT ---\n"
-                          . ($contractContent ? $contractContent : "CRITICAL ERROR: No text content was extracted or found for this document in the database.")
-                          . "\n--- END OF EXTRACTED TEXT ---\n\n"
-                          . "Instructions:\n"
-                          . "1. For general greetings or casual chat (e.g., 'hi', 'how are you', 'شو أخبارك'), reply warmly in the user's language and remind them to ask questions about this specific document.\n"
-                          . "2. For questions regarding the document, answer accurately, objectively, and professionally based ONLY on the extracted text provided above.\n"
-                          . "3. If the user asks about information that does not exist in the text, or if the extracted text is empty, clearly state that the information cannot be found within the document context.\n"
-                          . "4. STRICT LANGUAGE MATCHING: Detect the language of the user's prompt. If they ask in Arabic, reply in Arabic. If they ask in English, reply in English.\n\n"
-                          . "5. OUTPUT FORMAT (CRITICAL): You MUST respond with ONLY a raw JSON object, no markdown, no code fences, matching exactly this schema:\n"
-                          . "{\n"
-                          . "  \"answer\": \"Your full, professional answer in the appropriate language.\",\n"
-                          . "  \"quote\": \"An exact short excerpt (max ~25 words), copied VERBATIM word-for-word from the extracted document text above, that directly supports your answer. If this is a greeting/small talk or the document has no relevant text, return an empty string.\"\n"
-                          . "}";
+            // برومت واضح ومحدد يستخرج القيمة الأساسية المستهدفة
+            $systemPrompt = "You are 'LexiGuard AI', an elite document analysis assistant. Answer the user's question based strictly on the text provided below.\n\n"
+              . "DOCUMENT TEXT:\n"
+              . "--- START ---\n"
+              . $contractContent
+              . "\n--- END ---\n\n"
+              . "INSTRUCTIONS:\n"
+              . "1. Respond in the same language as the user's question (Arabic or English).\n"
+              . "2. You MUST return a JSON object with exactly two fields:\n"
+              . "   - \"answer\": Your professional, fluent answer based on the text.\n"
+              . "   - \"quote\": Extract ONLY the exact core keyword, phrase, or numerical value (1 to 4 words max) from the text that answers the question (e.g., if asked about duration, return '14 يوم'; if asked about framework, return 'Laravel').\n\n"
+              . "OUTPUT FORMAT:\n"
+              . "{\n"
+              . "  \"answer\": \"your_answer_here\",\n"
+              . "  \"quote\": \"core_keyword_or_phrase_here\"\n"
+              . "}";
 
             $response = Http::withToken(config('services.groq.key'))
                 ->timeout(60)
                 ->post('https://api.groq.com/openai/v1/chat/completions', [
-                    'model' => 'openai/gpt-oss-20b',
+                    'model' => 'llama-3.3-70b-versatile', 
                     'messages' => [
                         ['role' => 'system', 'content' => $systemPrompt],
                         ['role' => 'user', 'content' => $request->message]
                     ],
-                    'temperature' => 0.3,
-                    'max_tokens' => 1024,
+                    'temperature' => 0.1, 
+                    'max_tokens' => 1200,
                     'response_format' => ['type' => 'json_object'],
                 ]);
 
             if ($response->failed()) {
-                Log::error('Groq API Connection Failed', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                ]);
-
-                return response()->json([
-                    'error' => 'Failed to process request with AI service.',
-                    'debug_status' => $response->status(),
-                ], 500);
+                Log::error('Groq API Connection Failed', ['status' => $response->status()]);
+                return response()->json(['error' => 'Failed to process request with AI service.'], 500);
             }
 
             $aiData = $response->json();
             $rawContent = $aiData['choices'][0]['message']['content'] ?? null;
 
-            $parsed = json_decode($rawContent, true);
-            $aiResponse = $parsed['answer'] ?? ($rawContent ?: 'Unable to parse an answer from the document context.');
-            $sourceQuote = trim($parsed['quote'] ?? '');
+            $parsed = json_decode(trim($rawContent), true);
+            $aiResponse = $parsed['answer'] ?? ($rawContent ?: 'Unable to parse an answer.');
+            $extractedKeyword = trim($parsed['quote'] ?? '');
 
+            // 🌟 السحر البرمجي المطور: تنظيف الكلمة المستخرجة والنص الأصلي من الرموز المخفية لتسهيل المطابقة
+            $finalSourceQuote = null;
+            if (!empty($extractedKeyword)) {
+                // إزالة علامات اتجاه النص والرموز الغريبة من الكلمة المفتاحية للبحث السليم
+                $cleanKeyword = preg_replace('/[\x{200E}\x{200F}\x{202A}-\x{202E}]/u', '', $extractedKeyword);
+                $cleanKeyword = trim(preg_replace('/\s+/', ' ', $cleanKeyword));
+
+                $lines = explode("\n", $contractContent);
+                foreach ($lines as $line) {
+                    // تنظيف السطر الحالي مؤقتاً لمطابقته مع الكلمة النظيفة
+                    $cleanLine = preg_replace('/[\x{200E}\x{200F}\x{202A}-\x{202E}]/u', '', $line);
+                    $cleanLine = preg_replace('/\s+/', ' ', $cleanLine);
+
+                    if (!empty($cleanKeyword) && mb_strpos($cleanLine, $cleanKeyword) !== false) {
+                        $finalSourceQuote = trim($line); // نأخذ السطر الأصلي بكامل تنسيقه الأصلي وعلاماته
+                        break; 
+                    }
+                }
+                
+                // Fallback الذكي: إذا لم نجد السطر بسبب التقطيع الشديد، نعتمد على الكلمة المستخرجة نفسها كاقتباس
+                if (!$finalSourceQuote) {
+                    $finalSourceQuote = $extractedKeyword;
+                }
+            }
+
+            // حفظ السجل في قاعدة البيانات بالاقتباس المؤكد
             $chat = AiChat::create([
                 'document_id'   => $document->id,
                 'user_id'       => auth()->id(),
                 'message'       => $request->message,
                 'response'      => $aiResponse,
-                'source_quote'  => $sourceQuote ?: null,
+                'source_quote'  => $finalSourceQuote ?: null,
             ]);
 
             return response()->json([

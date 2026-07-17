@@ -6,7 +6,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AiChat extends Model
 {
-    protected $fillable = ['document_id', 'user_id', 'message', 'response'];
+    protected  $fillable = [
+    'document_id',
+    'user_id',
+    'message',
+    'response',
+    'source_quote'
+];
 
     // AiChat belongsTo Document
     public function document(): BelongsTo

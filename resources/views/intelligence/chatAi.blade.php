@@ -148,13 +148,22 @@
                             <div class="flex flex-col gap-2 max-w-full">
                                 <div class="bg-white text-slate-800 px-4 py-3 rounded-2xl rounded-tl-none border border-slate-200 shadow-sm text-[15px] leading-relaxed font-normal" dir="auto">
                                     {{ $chat->response }}
+
+                                    {{-- 🌟 الميزة الجديدة: عرض الاقتباس داخل دبل كوتيشن مخصص ومميز بصرياً --}}
+                                    @if(!empty($chat->source_quote))
+                                        <div class="mt-3 p-3 bg-amber-50/60 border-l-4 border-amber-400 rounded-r-xl text-xs text-slate-700 italic select-text">
+                                            <span class="text-amber-500 font-serif text-lg leading-none">“</span>
+                                            {{ $chat->source_quote }}
+                                            <span class="text-amber-500 font-serif text-lg leading-none">”</span>
+                                        </div>
+                                    @endif
                                 </div>
                                 @if(!empty($chat->source_quote))
                                     <button type="button"
                                         class="show-source-btn self-start inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200/80 rounded-xl px-3 py-1.5 hover:bg-amber-100 transition-colors shadow-2xs"
                                         data-quote="{{ $chat->source_quote }}">
                                         <span class="material-symbols-outlined text-sm">location_on</span>
-                                        اعرض المصدر بالمستند
+display source from document 
                                     </button>
                                 @endif
                             </div>
@@ -320,6 +329,16 @@
 
         function appendAiMessage(text, quote) {
             const hasQuote = quote && normalizeSpaces(quote);
+
+            // 🌟 نقوم ببناء الـ HTML المخصص لعرض الاقتباس داخل دبل كوتيشن في الرسائل المضافة حياً
+            const quoteHtml = hasQuote ? `
+                <div class="mt-3 p-3 bg-amber-50/60 border-l-4 border-amber-400 rounded-r-xl text-xs text-slate-700 italic select-text">
+                    <span class="text-amber-500 font-serif text-lg leading-none">“</span>
+                    ${escapeHtml(quote)}
+                    <span class="text-amber-500 font-serif text-lg leading-none">”</span>
+                </div>
+            ` : '';
+
             const html = `
                 <div class="flex items-start gap-3 max-w-[85%] animate-fade-in-up">
                     <div class="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex-shrink-0 flex items-center justify-center shadow-2xs">
@@ -328,6 +347,7 @@
                     <div class="flex flex-col gap-2 max-w-full">
                         <div class="bg-white text-slate-800 px-4 py-3 rounded-2xl rounded-tl-none border border-slate-200 shadow-sm text-[15px] leading-relaxed font-normal">
                             <p></p>
+                            ${quoteHtml}
                         </div>
                         ${hasQuote ? `
                         <button type="button" class="show-source-btn self-start inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200/80 rounded-xl px-3 py-1.5 hover:bg-amber-100 transition-colors shadow-2xs">
