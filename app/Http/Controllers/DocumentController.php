@@ -8,8 +8,10 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use ArPHP\I18N\Arabic;
+use Illuminate\Support\Facades\Auth;
 use Mpdf\Mpdf;
 
 class DocumentController extends Controller
@@ -71,7 +73,7 @@ class DocumentController extends Controller
 
   public function history(Request $request)
 {
-    $query = auth()->user()->documents()
+    $query = Auth::user()->documents()
         ->with(['analyses' => fn ($q) => $q->latest()]);
 
     // 2. تطبيق فلترة مستوى الخطورة (Risk Level) بناءً على الـ Request
@@ -93,7 +95,7 @@ class DocumentController extends Controller
     $documents = $query->latest()->paginate(10)->withQueryString();
 
     // 🌟 التعديل هنا: جلب آخر 5 مستندات للمستخدم الحالي فقط من أجل القائمة الجانبية أو العلوية
-    $recentDocuments = auth()->user()->documents()->latest()->take(5)->get();
+    $recentDocuments = Auth::user()->documents()->latest()->take(5)->get();
 
     // تمرير المتغير الجديد للواجهة
     return view('documents.history', compact('documents', 'recentDocuments'));
@@ -101,6 +103,8 @@ class DocumentController extends Controller
 
     public function show(Document $document)
     {
+        Gate::authorize('view', $document);
+
         $document->load('analyses');
         $analysis = $document->analyses->first();
 
@@ -113,7 +117,7 @@ class DocumentController extends Controller
 
     public function destroy(Document $document)
     {
-        abort_unless($document->user_id === auth()->id(), 403);
+        Gate::authorize('delete', $document);
 
         $document->delete();
 
@@ -122,7 +126,7 @@ class DocumentController extends Controller
 
     public function getStatus(Document $document)
     {
-        abort_unless($document->user_id === auth()->id(), 403);
+        Gate::authorize('view', $document);
 
         return response()->json([
             'status' => $document->status,     // pending / processing / done / failed
@@ -133,6 +137,8 @@ class DocumentController extends Controller
 public function exportPdf($id)
 {
     $document = Document::findOrFail($id);
+    Gate::authorize('view', $document);
+
     $analysis = $document->analyses()->latest()->first();
 
     abort_if(! $analysis, 404, 'Analysis report is not ready yet.');
@@ -160,7 +166,7 @@ public function exportPdf($id)
 }
     public function exportWord(Document $document)
     {
-        abort_unless($document->user_id === auth()->id(), 403);
+        Gate::authorize('view', $document);
 
         $analysis = $document->analyses()->latest()->first();
         abort_if(! $analysis, 404, 'Analysis report is not ready yet.');
